@@ -11,8 +11,11 @@ from src.models.GP_params import likelihood
 
 root = get_project_root()
 
-def training_epoch(train_x, train_y):
-    model = GPWithNNFeatureExtractor(train_x, train_y, likelihood)
+def training_epoch(x_train, y_train):
+    model = GPWithNNFeatureExtractor(x_train, y_train, likelihood)
+    if hparams.TRAIN.PRE_TRAINED:
+        state_dict = torch.load(os.path.join(root, "logs", hparams.TRAIN.EXISTING_NAME))
+        model.load_state_dict(state_dict)
 
     model.train()
     likelihood.train()
@@ -26,8 +29,8 @@ def training_epoch(train_x, train_y):
     for i in range(training_iter):
         with torch.autocast(device_type=device, dtype=torch.float16):
             optimizer.zero_grad()
-            output = model(train_x)
-            loss = -mll(output, train_y)
+            output = model(x_train)
+            loss = -mll(output, y_train)
             loss.backward()
             print('Iter %d/%d - Loss: %.3f' % (i + 1, training_iter, loss.item()))
             optimizer.step()
@@ -36,7 +39,7 @@ def training_epoch(train_x, train_y):
         torch.save(model.state_dict(), os.path.join(root, "logs", hparams.TRAIN.NAME))
 
 
-def main():
+def load_data():
     x_train_path = os.path.join(root, DATA_FOLDER, "x_train.csv")
     y_train_path = os.path.join(root, DATA_FOLDER, "y_train.csv")
 
@@ -52,6 +55,18 @@ def main():
         y_train = torch.tensor(y_train).to(torch.float32)
     else:
         y_train = torch.tensor(y_train[:, 0]).to(torch.float32)
+
+    return x_train, y_train
+
+def main():
+    print(f"preparing training with params: \n "
+          f"Multitask: {str(hparams.MODEL.MULTITASK)} \n"
+          f"Kernel: {hparams.MODEL.KERNEL} \n"
+          f"Learning Rate: {hparams.OPTIMIZER.LR} \n"
+          f"Encoder Output Dimension: {hparams.ENCODER.OUTPUT_DIM} \n"
+          f"Pre-Trained Model: {str(hparams.TRAIN.PRE_TRAINED)} \n"
+          f"Saving model: {str(hparams.TRAIN.SAVE_MODEL)} to {hparams.TRAIN.NAME} \n")
+    x_train, y_train = load_data()
 
     np.random.seed(hparams.SEED)
     torch.manual_seed(hparams.SEED)

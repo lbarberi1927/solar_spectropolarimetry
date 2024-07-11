@@ -33,8 +33,10 @@ hparams.TRAIN.ITER = 5
 hparams.TRAIN.FAST_RUN = True
 hparams.TRAIN.ROWS = 1000
 hparams.TRAIN.TEST_SIZE = 0.2
-hparams.TRAIN.SAVE_MODEL = False
-hparams.TRAIN.NAME = "basic_configs/attempt_zero.pth"
+hparams.TRAIN.SAVE_MODEL = True
+hparams.TRAIN.NAME = "basic_configs/attempt_zero_10_iter.pth"
+hparams.TRAIN.PRE_TRAINED = True
+hparams.TRAIN.EXISTING_NAME = "basic_configs/attempt_zero_5_iter.pth"
 
 hparams.LOSS = CN()
 hparams.LOSS.TYPE = "mll"
