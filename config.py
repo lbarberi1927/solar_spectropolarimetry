@@ -25,8 +25,7 @@ hparams.MODEL.OUTPUT_DIM = 4
 hparams.ENCODER = CN()
 hparams.ENCODER.INPUT_DIM = 4
 hparams.ENCODER.HIDDEN_DIM = 2
-hparams.ENCODER.OUTPUT_DIM = 1
-
+hparams.ENCODER.LATENT_DIM = 1
 
 hparams.TRAIN = CN()
 hparams.TRAIN.ITER = 5
@@ -34,9 +33,15 @@ hparams.TRAIN.FAST_RUN = True
 hparams.TRAIN.ROWS = 1000
 hparams.TRAIN.TEST_SIZE = 0.2
 hparams.TRAIN.SAVE_MODEL = True
-hparams.TRAIN.NAME = "basic_configs/attempt_zero_10_iter.pth"
-hparams.TRAIN.PRE_TRAINED = True
+hparams.TRAIN.NAME = "variational/attempt_zero_5_epochs.pth"
+hparams.TRAIN.PRE_TRAINED = False
 hparams.TRAIN.EXISTING_NAME = "basic_configs/attempt_zero_5_iter.pth"
+
+hparams.VARIATIONAL = CN()
+hparams.VARIATIONAL.ENABLE = True
+hparams.VARIATIONAL.N_INDUCING_POINTS = 100
+hparams.VARIATIONAL.BATCH_SIZE = 32
+hparams.VARIATIONAL.EPOCHS = 5
 
 hparams.LOSS = CN()
 hparams.LOSS.TYPE = "mll"

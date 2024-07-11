@@ -13,7 +13,7 @@ class GPWithNNFeatureExtractor(gpytorch.models.ExactGP):
 
         input_dim = hparams.ENCODER.INPUT_DIM
         hidden_dim = hparams.ENCODER.HIDDEN_DIM
-        output_dim = hparams.ENCODER.OUTPUT_DIM
+        output_dim = hparams.ENCODER.LATENT_DIM
 
         self.feature_extractor = torch.nn.Sequential(
             torch.nn.Linear(input_dim, hidden_dim),
