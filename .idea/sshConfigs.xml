@@ -1,0 +1,9 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<project version="4">
+  <component name="SshConfigs">
+    <configs>
+      <sshConfig authType="PASSWORD" host="sirius" id="971690fe-3006-4d12-8ec2-c4f7c179636d" port="22" nameFormat="DESCRIPTIVE" username="barberi" useOpenSSHConfig="true" />
+      <sshConfig authType="PASSWORD" host="core4" id="70fe90f2-f21e-49dc-b7e0-e6ebb2c4824c" port="22" nameFormat="DESCRIPTIVE" username="barberi" useOpenSSHConfig="true" />
+    </configs>
+  </component>
+</project>

@@ -1,0 +1,21 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<project version="4">
+  <component name="WebServers">
+    <option name="servers">
+      <webServer id="11559f48-fa0a-4f69-8547-0850c9fae775" name="sirius">
+        <fileTransfer accessType="SFTP" host="sirius" port="22" sshConfigId="971690fe-3006-4d12-8ec2-c4f7c179636d" sshConfig="barberi@sirius:22 password">
+          <advancedOptions>
+            <advancedOptions dataProtectionLevel="Private" keepAliveTimeout="0" passiveMode="true" shareSSLContext="true" />
+          </advancedOptions>
+        </fileTransfer>
+      </webServer>
+      <webServer id="67614bbf-24ee-4162-a069-39a435f20b11" name="core4">
+        <fileTransfer accessType="SFTP" host="core4" port="22" sshConfigId="70fe90f2-f21e-49dc-b7e0-e6ebb2c4824c" sshConfig="barberi@core4:22 password">
+          <advancedOptions>
+            <advancedOptions dataProtectionLevel="Private" keepAliveTimeout="0" passiveMode="true" shareSSLContext="true" />
+          </advancedOptions>
+        </fileTransfer>
+      </webServer>
+    </option>
+  </component>
+</project>
