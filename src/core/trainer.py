@@ -4,6 +4,7 @@ import numpy as np
 import torch
 from sklearn.cluster import MiniBatchKMeans
 from torch.utils.data import TensorDataset, DataLoader
+import tqdm
 
 from config import hparams, DATA_FOLDER
 from src.models.gaussian_process_raw import ExactGPModel
@@ -46,19 +47,10 @@ def train_standard_model(x_train, y_train):
 
 
 def train_variational_model(x_train, y_train):
-    print("training variational model", flush=True)
-
-    kmeans = MiniBatchKMeans(
-        n_clusters=hparams.VARIATIONAL.N_INDUCING_POINTS,
-        verbose=3,
-        batch_size=hparams.VARIATIONAL.K_MEANS_BATCH,
-        random_state=hparams.SEED
-    )
-    kmeans.fit(x_train)
-    inducing_points = torch.tensor(kmeans.cluster_centers_).to(torch.float32).to(device)
-    print("found inducing points", inducing_points.shape, flush=True)
     x_train = x_train.to(torch.device(device))
     y_train = y_train.to(torch.device(device))
+    inducing_points = np.loadtxt(os.path.join(root, DATA_FOLDER, "inducing_points.csv"), delimiter=",")
+    inducing_points = torch.from_numpy(inducing_points).to(torch.float32).to(torch.device(device))
 
     model = SVGPModel(inducing_points)
     if hparams.TRAIN.PRE_TRAINED:
@@ -77,20 +69,20 @@ def train_variational_model(x_train, y_train):
     model.train()
     likelihood.train()
 
-    print("on cuddem" if next(model.parameters()).is_cuda else "on cpu", flush=True)
-
     for epoch in range(hparams.VARIATIONAL.EPOCHS):
         n_batches = 0
         acc_loss = 0
-        for batch_x, batch_y in dataloader:
-            print("batch", n_batches, flush=True)
-            optimizer.zero_grad()
-            output = model(batch_x)
-            loss = -mll(output, batch_y)
-            loss.backward()
-            optimizer.step()
-            acc_loss += loss.item()
-            n_batches += 1
+
+        minibatch_iter = tqdm.notebook.tqdm(dataloader, desc="Minibatch", leave=False)
+        for batch_x, batch_y in minibatch_iter:
+            with torch.autocast(device_type=device, dtype=torch.float16):
+                optimizer.zero_grad()
+                output = model(batch_x)
+                loss = -mll(output, batch_y)
+                loss.backward()
+                optimizer.step()
+                acc_loss += loss.item()
+                n_batches += 1
         print('Epoch %d/%d - Mean Loss: %.3f' % (epoch + 1, hparams.VARIATIONAL.EPOCHS, acc_loss/n_batches), flush=True)
 
     if hparams.TRAIN.SAVE_MODEL:
@@ -107,11 +99,11 @@ def load_data():
         x_train = np.loadtxt(x_train_path, delimiter=",")
         y_train = np.loadtxt(y_train_path, delimiter=",")
 
-    x_train = torch.tensor(x_train).to(torch.float32)
+    x_train = torch.from_numpy(x_train).to(torch.float32)
     if hparams.MODEL.MULTITASK:
-        y_train = torch.tensor(y_train).to(torch.float32)
+        y_train = torch.from_numpy(y_train).to(torch.float32)
     else:
-        y_train = torch.tensor(y_train[:, 0]).to(torch.float32)
+        y_train = torch.from_numpy(y_train[:, 0]).to(torch.float32)
 
     return x_train, y_train
 
