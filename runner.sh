@@ -16,7 +16,7 @@ echo "SLURM_JOB_ID:    ${SLURM_JOB_ID}"
 echo "Running on node: $(hostname)"
 
 # Binary or script to execute
-python -m src.core.trainer
+python -m src.data_flow.inducing_points
 
 # Send more noteworthy information to the output log
 echo "Finished at:     $(date)"

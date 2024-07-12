@@ -13,10 +13,10 @@ hparams.SEED = 42
 
 hparams.OPTIMIZER = CN()
 hparams.OPTIMIZER.TYPE = 'adam'
-hparams.OPTIMIZER.LR = 1e-1
+hparams.OPTIMIZER.LR = 1e-5
 
 hparams.MODEL = CN()
-hparams.MODEL.KERNEL = "RBF"
+hparams.MODEL.KERNEL = "RBF + MATERN"
 hparams.MODEL.PRIOR_MEAN = "CONSTANT"
 # hparams.MODEL.LIKELIHOOD = "GAUSSIAN"
 hparams.MODEL.MULTITASK = True
@@ -33,16 +33,17 @@ hparams.TRAIN.FAST_RUN = False
 hparams.TRAIN.ROWS = 1000
 hparams.TRAIN.TEST_SIZE = 0.2
 hparams.TRAIN.SAVE_MODEL = True
-hparams.TRAIN.NAME = "variational/cluster_run.pth"
+hparams.TRAIN.NAME = "basic/cluster_run.pth"
 hparams.TRAIN.PRE_TRAINED = False
 hparams.TRAIN.EXISTING_NAME = "basic_configs/attempt_zero_5_iter.pth"
 
 hparams.VARIATIONAL = CN()
 hparams.VARIATIONAL.ENABLE = True
-hparams.VARIATIONAL.N_INDUCING_POINTS = 500
+hparams.VARIATIONAL.N_INDUCING_POINTS = 10000
 hparams.VARIATIONAL.BATCH_SIZE = 64
 hparams.VARIATIONAL.EPOCHS = 5
-hparams.VARIATIONAL.K_MEANS_BATCH = 10000
+hparams.VARIATIONAL.K_MEANS_BATCH = 100000
+hparams.VARIATIONAL.INDUCING_ALGORITHM = "minibatch_kmeans"
 
 hparams.LOSS = CN()
 hparams.LOSS.TYPE = "mll"

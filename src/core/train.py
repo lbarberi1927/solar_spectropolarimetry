@@ -2,9 +2,7 @@ import os
 import gpytorch
 import numpy as np
 import torch
-from sklearn.cluster import MiniBatchKMeans
 from torch.utils.data import TensorDataset, DataLoader
-import tqdm
 
 from config import hparams, DATA_FOLDER
 from src.models.gaussian_process_raw import ExactGPModel
@@ -15,6 +13,7 @@ from src.models.GP_params import likelihood
 
 root = get_project_root()
 device = "cuda" if torch.cuda.is_available() else "cpu"
+
 
 def train_standard_model(x_train, y_train):
     model = GPWithNNFeatureExtractor(x_train, y_train, likelihood)
@@ -61,29 +60,34 @@ def train_variational_model(x_train, y_train):
     dataset = TensorDataset(x_train, y_train)
     dataloader = DataLoader(dataset, batch_size=hparams.VARIATIONAL.BATCH_SIZE)
 
-    optimizer = torch.optim.Adam(
-        [{'params': model.parameters()}, {'params': likelihood.parameters()}],
-        lr=hparams.OPTIMIZER.LR)
+    if hparams.OPTIMIZER.TYPE == 'adam':
+        optimizer = torch.optim.Adam(
+            [{'params': model.parameters()}, {'params': likelihood.parameters()}],
+            lr=hparams.OPTIMIZER.LR)
+    elif hparams.OPTIMIZER.TYPE == 'L-BFGS':
+        params = list(model.parameters()) + list(likelihood.parameters())
+        optimizer = torch.optim.LBFGS(
+            params,
+            lr=hparams.OPTIMIZER.LR)
     mll = gpytorch.mlls.VariationalELBO(likelihood, model, num_data=y_train.size(0)).to(torch.device(device))
 
     model.train()
     likelihood.train()
 
-    for epoch in range(hparams.VARIATIONAL.EPOCHS):
-        n_batches = 0
-        acc_loss = 0
-
-        minibatch_iter = tqdm.notebook.tqdm(dataloader, desc="Minibatch", leave=False)
-        for batch_x, batch_y in minibatch_iter:
-            with torch.autocast(device_type=device, dtype=torch.float16):
-                optimizer.zero_grad()
-                output = model(batch_x)
-                loss = -mll(output, batch_y)
-                loss.backward()
-                optimizer.step()
-                acc_loss += loss.item()
-                n_batches += 1
-        print('Epoch %d/%d - Mean Loss: %.3f' % (epoch + 1, hparams.VARIATIONAL.EPOCHS, acc_loss/n_batches), flush=True)
+    with gpytorch.settings.cholesky_jitter(1e-3):
+        for epoch in range(hparams.VARIATIONAL.EPOCHS):
+            n_batches = 0
+            acc_loss = 0
+            for batch_x, batch_y in iter(dataloader):
+                with torch.autocast(device_type=device, dtype=torch.float16):
+                    optimizer.zero_grad()
+                    output = model(batch_x)
+                    loss = -mll(output, batch_y)
+                    loss.backward()
+                    optimizer.step()
+                    acc_loss += loss.item()
+                    n_batches += 1
+            print('Epoch %d/%d - Mean Loss: %.3f' % (epoch + 1, hparams.VARIATIONAL.EPOCHS, acc_loss/n_batches), flush=True)
 
     if hparams.TRAIN.SAVE_MODEL:
         torch.save(model.state_dict(), os.path.join(root, "logs", hparams.TRAIN.NAME))

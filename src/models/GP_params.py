@@ -27,6 +27,11 @@ multitask_kernel = {
         gpytorch.kernels.MaternKernel(batch_shape=torch.Size([hparams.MODEL.OUTPUT_DIM])),
         batch_shape=torch.Size([hparams.MODEL.OUTPUT_DIM]),
     ),
+    "RBF + MATERN": gpytorch.kernels.ScaleKernel(
+        gpytorch.kernels.RBFKernel(batch_shape=torch.Size([hparams.MODEL.OUTPUT_DIM]))
+        + gpytorch.kernels.MaternKernel(batch_shape=torch.Size([hparams.MODEL.OUTPUT_DIM])),
+        batch_shape=torch.Size([hparams.MODEL.OUTPUT_DIM]),
+    ),
 }
 
 
