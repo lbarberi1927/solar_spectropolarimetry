@@ -3,7 +3,6 @@
 #SBATCH --output=output.txt
 
 #SBATCH --time=10:00:00
-#SBATCH --mem-per-cpu=16000
 #SBATCH --partition=gpu
 #SBATCH --gres=gpu:1
 
@@ -16,7 +15,7 @@ echo "SLURM_JOB_ID:    ${SLURM_JOB_ID}"
 echo "Running on node: $(hostname)"
 
 # Binary or script to execute
-python -m src.data_flow.inducing_points
+python -m src.core.train
 
 # Send more noteworthy information to the output log
 echo "Finished at:     $(date)"

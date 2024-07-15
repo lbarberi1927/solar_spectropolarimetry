@@ -20,7 +20,7 @@ multitask_prior_mean = {
 
 multitask_kernel = {
     "RBF": gpytorch.kernels.ScaleKernel(
-        gpytorch.kernels.RBFKernel(batch_shape=torch.Size([hparams.MODEL.OUTPUT_DIM])),
+        gpytorch.kernels.keops.RBFKernel(batch_shape=torch.Size([hparams.MODEL.OUTPUT_DIM])),
         batch_shape=torch.Size([hparams.MODEL.OUTPUT_DIM]),
     ),
     "MATERN": gpytorch.kernels.ScaleKernel(

@@ -13,6 +13,9 @@ from src.models.GP_params import likelihood
 
 root = get_project_root()
 device = "cuda" if torch.cuda.is_available() else "cpu"
+torch.cuda.empty_cache()
+torch.backends.cuda.matmul.allow_tf32 = True
+torch.backends.cuda.matmul.allow_fp16_reduced_precision_reduction = True
 
 
 def train_standard_model(x_train, y_train):
@@ -45,12 +48,7 @@ def train_standard_model(x_train, y_train):
         torch.save(model.state_dict(), os.path.join(root, "logs", hparams.TRAIN.NAME))
 
 
-def train_variational_model(x_train, y_train):
-    x_train = x_train.to(torch.device(device))
-    y_train = y_train.to(torch.device(device))
-    inducing_points = np.loadtxt(os.path.join(root, DATA_FOLDER, "inducing_points.csv"), delimiter=",")
-    inducing_points = torch.from_numpy(inducing_points).to(torch.float32).to(torch.device(device))
-
+def train_variational_model(x_train, y_train, inducing_points):
     model = SVGPModel(inducing_points)
     if hparams.TRAIN.PRE_TRAINED:
         state_dict = torch.load(os.path.join(root, "logs", hparams.TRAIN.EXISTING_NAME))
@@ -73,22 +71,26 @@ def train_variational_model(x_train, y_train):
 
     model.train()
     likelihood.train()
+    print(f"Before training: {torch.cuda.memory_allocated()}", flush=True)
 
-    with gpytorch.settings.cholesky_jitter(1e-3):
-        for epoch in range(hparams.VARIATIONAL.EPOCHS):
-            n_batches = 0
-            acc_loss = 0
-            for batch_x, batch_y in iter(dataloader):
-                with torch.autocast(device_type=device, dtype=torch.float16):
-                    optimizer.zero_grad()
-                    output = model(batch_x)
-                    loss = -mll(output, batch_y)
-                    loss.backward()
-                    optimizer.step()
-                    acc_loss += loss.item()
-                    n_batches += 1
-            print('Epoch %d/%d - Mean Loss: %.3f' % (epoch + 1, hparams.VARIATIONAL.EPOCHS, acc_loss/n_batches), flush=True)
+    for epoch in range(hparams.VARIATIONAL.EPOCHS):
+        n_batches = 0
+        acc_loss = 0
+        for batch_x, batch_y in iter(dataloader):
+            batch_x = batch_x.to(torch.device(device))
+            batch_y = batch_y.to(torch.device(device))
+            print(f"Batch: {n_batches}, {torch.cuda.memory_allocated()}", flush=True)
+            with torch.autocast(device_type=device, dtype=torch.float16):
+                optimizer.zero_grad()
+                output = model(batch_x)
+                loss = -mll(output, batch_y)
+                loss.backward()
+                optimizer.step()
+                acc_loss += loss.item()
+                n_batches += 1
+        print('Epoch %d/%d - Mean Loss: %.3f' % (epoch + 1, hparams.VARIATIONAL.EPOCHS, acc_loss/n_batches), flush=True)
 
+    print(f"After training: {torch.cuda.memory_allocated()}", flush=True)
     if hparams.TRAIN.SAVE_MODEL:
         torch.save(model.state_dict(), os.path.join(root, "logs", hparams.TRAIN.NAME))
 
@@ -121,13 +123,19 @@ def main():
           f"Saving model: {str(hparams.TRAIN.SAVE_MODEL)} to {hparams.TRAIN.NAME} \n"
           f"Variational Model Enabled: {str(hparams.VARIATIONAL.ENABLE)}\n"
           f"Device: {device} \n", flush=True)
+    print(f"Start: {torch.cuda.memory_allocated()}")
+
     x_train, y_train = load_data()
 
     np.random.seed(hparams.SEED)
     torch.manual_seed(hparams.SEED)
 
+    inducing_points = np.loadtxt(os.path.join(root, DATA_FOLDER, "inducing_points.csv"), delimiter=",")
+    inducing_points = torch.from_numpy(inducing_points).to(torch.float32).to(torch.device(device))
+    print(f"After data: {torch.cuda.memory_allocated()}", flush=True)
+
     if hparams.VARIATIONAL.ENABLE:
-        train_variational_model(x_train, y_train)
+        train_variational_model(x_train, y_train, inducing_points)
     else:
         train_standard_model(x_train, y_train)
 

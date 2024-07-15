@@ -23,7 +23,10 @@ class ConfigEncoder(nn.Module):
 # Define the SVGP model
 class SVGPModel(gpytorch.models.ApproximateGP):
     def __init__(self, inducing_points):
-        variational_distribution = gpytorch.variational.CholeskyVariationalDistribution(inducing_points.size(0))
+        variational_distribution = gpytorch.variational.MeanFieldVariationalDistribution(
+            inducing_points.size(-2),
+            batch_shape=torch.Size([hparams.MODEL.OUTPUT_DIM]),
+        )
         variational_strategy = gpytorch.variational.IndependentMultitaskVariationalStrategy(
             gpytorch.variational.VariationalStrategy(
                 self, inducing_points, variational_distribution, learn_inducing_locations=True
@@ -40,8 +43,14 @@ class SVGPModel(gpytorch.models.ApproximateGP):
         configs = self.encoder(configs)
         return torch.cat((configs, x[:, 4:]), dim=1)
 
+    def reduce(self, x):
+        return self.encoder(x)
+
     def forward(self, x):
-        x = self.separate_concatenate(x)
+        if hparams.ENCODE_DELTA_LAMBDA:
+            x = self.reduce(x)
+        else:
+            x = self.separate_concatenate(x)
         mean_x = self.mean_module(x)
         covar_x = self.covar_module(x)
         return gpytorch.distributions.MultivariateNormal(mean_x, covar_x)
