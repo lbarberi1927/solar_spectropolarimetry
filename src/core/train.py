@@ -13,9 +13,6 @@ from src.models.GP_params import likelihood
 
 root = get_project_root()
 device = "cuda" if torch.cuda.is_available() else "cpu"
-torch.cuda.empty_cache()
-torch.backends.cuda.matmul.allow_tf32 = True
-torch.backends.cuda.matmul.allow_fp16_reduced_precision_reduction = True
 
 
 def train_standard_model(x_train, y_train):
@@ -97,7 +94,7 @@ def train_variational_model(x_train, y_train, inducing_points):
 
     model.train()
     likelihood.train()
-    print(f"Before training: {torch.cuda.memory_allocated()}", flush=True)
+    print(f"Before training: {torch.cuda.memory_allocated()}, {torch.cuda.mem_get_info()}", flush=True)
 
     for epoch in range(hparams.VARIATIONAL.EPOCHS):
         n_batches = 0
@@ -165,7 +162,12 @@ def main():
         f"Device: {device} \n",
         flush=True,
     )
-    print(f"Start: {torch.cuda.memory_allocated()}")
+
+    torch.cuda.empty_cache()
+    torch.backends.cuda.matmul.allow_tf32 = True
+    torch.backends.cuda.matmul.allow_fp16_reduced_precision_reduction = True
+
+    print(f"In the beninging: {torch.cuda.memory_allocated(), torch.cuda.mem_get_info()}")
 
     x_train, y_train = load_data()
 

@@ -163,3 +163,6 @@ cython_debug/
 
 data.nosync/
 logs/
+/gpu_check.sh
+/memory_usage.py
+/test_max_resources.sh
