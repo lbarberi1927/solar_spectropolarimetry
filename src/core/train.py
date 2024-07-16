@@ -7,7 +7,7 @@ from torch.utils.data import TensorDataset, DataLoader
 from config import hparams, DATA_FOLDER
 from src.models.gaussian_process_raw import ExactGPModel
 from src.models.gaussian_process_with_encoder import GPWithNNFeatureExtractor
-from src.models.variational_GP import SVGPModel
+from src.models.variational_GP import SVGPModel, ConfigEncoder
 from src.utils import get_project_root
 from src.models.GP_params import likelihood
 
@@ -30,7 +30,9 @@ def train_standard_model(x_train, y_train):
     training_iter = hparams.TRAIN.ITER
     optimizer = torch.optim.Adam(model.parameters(), lr=hparams.OPTIMIZER.LR)
 
-    mll = gpytorch.mlls.ExactMarginalLogLikelihood(likelihood, model).to(torch.device(device))
+    mll = gpytorch.mlls.ExactMarginalLogLikelihood(likelihood, model).to(
+        torch.device(device)
+    )
     model = model.to(torch.device(device))
     x_train = x_train.to(torch.device(device))
     y_train = y_train.to(torch.device(device))
@@ -41,7 +43,7 @@ def train_standard_model(x_train, y_train):
             output = model(x_train)
             loss = -mll(output, y_train)
             loss.backward()
-            print('Iter %d/%d - Loss: %.3f' % (i + 1, training_iter, loss.item()))
+            print("Iter %d/%d - Loss: %.3f" % (i + 1, training_iter, loss.item()))
             optimizer.step()
 
     if hparams.TRAIN.SAVE_MODEL:
@@ -49,25 +51,49 @@ def train_standard_model(x_train, y_train):
 
 
 def train_variational_model(x_train, y_train, inducing_points):
+    encoder = ConfigEncoder()
+    inducing_points = encoder(inducing_points)
+
     model = SVGPModel(inducing_points)
     if hparams.TRAIN.PRE_TRAINED:
-        state_dict = torch.load(os.path.join(root, "logs", hparams.TRAIN.EXISTING_NAME))
-        model.load_state_dict(state_dict)
+        model_state_dict = torch.load(
+            os.path.join(root, "logs", hparams.TRAIN.EXISTING_NAME)
+        )
+        model.load_state_dict(model_state_dict)
+
+        encoder_state_dict = torch.load(
+            os.path.join(
+                root,
+                "logs",
+                hparams.TRAIN.EXISTING_NAME.replace(".pth", "_encoder.pth"),
+            )
+        )
+        encoder.load_state_dict(encoder_state_dict)
+
     model = model.to(torch.device(device))
 
     dataset = TensorDataset(x_train, y_train)
     dataloader = DataLoader(dataset, batch_size=hparams.VARIATIONAL.BATCH_SIZE)
 
-    if hparams.OPTIMIZER.TYPE == 'adam':
+    if hparams.OPTIMIZER.TYPE == "adam":
         optimizer = torch.optim.Adam(
-            [{'params': model.parameters()}, {'params': likelihood.parameters()}],
-            lr=hparams.OPTIMIZER.LR)
-    elif hparams.OPTIMIZER.TYPE == 'L-BFGS':
-        params = list(model.parameters()) + list(likelihood.parameters())
-        optimizer = torch.optim.LBFGS(
-            params,
-            lr=hparams.OPTIMIZER.LR)
-    mll = gpytorch.mlls.VariationalELBO(likelihood, model, num_data=y_train.size(0)).to(torch.device(device))
+            [
+                {"params": model.parameters()},
+                {"params": likelihood.parameters()},
+                {"params": encoder.parameters()},
+            ],
+            lr=hparams.OPTIMIZER.LR,
+        )
+    elif hparams.OPTIMIZER.TYPE == "L-BFGS":
+        params = (
+            list(model.parameters())
+            + list(likelihood.parameters())
+            + list(encoder.parameters())
+        )
+        optimizer = torch.optim.LBFGS(params, lr=hparams.OPTIMIZER.LR)
+    mll = gpytorch.mlls.VariationalELBO(likelihood, model, num_data=y_train.size(0)).to(
+        torch.device(device)
+    )
 
     model.train()
     likelihood.train()
@@ -77,6 +103,7 @@ def train_variational_model(x_train, y_train, inducing_points):
         n_batches = 0
         acc_loss = 0
         for batch_x, batch_y in iter(dataloader):
+            batch_x = encoder(batch_x)
             batch_x = batch_x.to(torch.device(device))
             batch_y = batch_y.to(torch.device(device))
             print(f"Batch: {n_batches}, {torch.cuda.memory_allocated()}", flush=True)
@@ -88,11 +115,22 @@ def train_variational_model(x_train, y_train, inducing_points):
                 optimizer.step()
                 acc_loss += loss.item()
                 n_batches += 1
-        print('Epoch %d/%d - Mean Loss: %.3f' % (epoch + 1, hparams.VARIATIONAL.EPOCHS, acc_loss/n_batches), flush=True)
+        print(
+            "Epoch %d/%d - Mean Loss: %.3f"
+            % (epoch + 1, hparams.VARIATIONAL.EPOCHS, acc_loss / n_batches),
+            flush=True,
+        )
 
     print(f"After training: {torch.cuda.memory_allocated()}", flush=True)
     if hparams.TRAIN.SAVE_MODEL:
         torch.save(model.state_dict(), os.path.join(root, "logs", hparams.TRAIN.NAME))
+        torch.save(
+            encoder.state_dict(),
+            os.path.join(
+                root, "logs", hparams.TRAIN.NAME.replace(".pth", "_encoder.pth")
+            ),
+        )
+
 
 def load_data():
     x_train_path = os.path.join(root, DATA_FOLDER, "x_train.csv")
@@ -113,16 +151,20 @@ def load_data():
 
     return x_train, y_train
 
+
 def main():
-    print(f"preparing training with params: \n"
-          f"Multitask: {str(hparams.MODEL.MULTITASK)} \n"
-          f"Kernel: {hparams.MODEL.KERNEL} \n"
-          f"Learning Rate: {hparams.OPTIMIZER.LR} \n"
-          f"Encoder Output Dimension: {hparams.ENCODER.LATENT_DIM} \n"
-          f"Pre-Trained Model: {str(hparams.TRAIN.PRE_TRAINED)} \n"
-          f"Saving model: {str(hparams.TRAIN.SAVE_MODEL)} to {hparams.TRAIN.NAME} \n"
-          f"Variational Model Enabled: {str(hparams.VARIATIONAL.ENABLE)}\n"
-          f"Device: {device} \n", flush=True)
+    print(
+        f"preparing training with params: \n"
+        f"Multitask: {str(hparams.MODEL.MULTITASK)} \n"
+        f"Kernel: {hparams.MODEL.KERNEL} \n"
+        f"Learning Rate: {hparams.OPTIMIZER.LR} \n"
+        f"Encoder Output Dimension: {hparams.ENCODER.LATENT_DIM} \n"
+        f"Pre-Trained Model: {str(hparams.TRAIN.PRE_TRAINED)} \n"
+        f"Saving model: {str(hparams.TRAIN.SAVE_MODEL)} to {hparams.TRAIN.NAME} \n"
+        f"Variational Model Enabled: {str(hparams.VARIATIONAL.ENABLE)}\n"
+        f"Device: {device} \n",
+        flush=True,
+    )
     print(f"Start: {torch.cuda.memory_allocated()}")
 
     x_train, y_train = load_data()
@@ -130,9 +172,12 @@ def main():
     np.random.seed(hparams.SEED)
     torch.manual_seed(hparams.SEED)
 
-    inducing_points = np.loadtxt(os.path.join(root, DATA_FOLDER, "inducing_points.csv"), delimiter=",")
-    inducing_points = torch.from_numpy(inducing_points).to(torch.float32).to(torch.device(device))
-    print(f"After data: {torch.cuda.memory_allocated()}", flush=True)
+    inducing_points = np.loadtxt(
+        os.path.join(root, DATA_FOLDER, "inducing_points.csv"), delimiter=","
+    )
+    inducing_points = torch.from_numpy(inducing_points).to(
+        torch.float32
+    )  # .to(torch.device(device))
 
     if hparams.VARIATIONAL.ENABLE:
         train_variational_model(x_train, y_train, inducing_points)
@@ -140,5 +185,5 @@ def main():
         train_standard_model(x_train, y_train)
 
 
-if __name__ == '__main__':
+if __name__ == "__main__":
     main()

@@ -24,10 +24,10 @@ hparams.MODEL.OUTPUT_DIM = 4
 
 hparams.ENCODE_DELTA_LAMBDA = True
 hparams.ENCODER = CN()
-hparams.ENCODER.INPUT_DIM = 5
+hparams.ENCODER.INPUT_DIM = 4
 hparams.ENCODER.HIDDEN_DIM = 2
-hparams.ENCODER.LATENT_DIM = 1
-hparams.ENCODER.MODEL = "PCA"  # PCA OR NN
+hparams.ENCODER.LATENT_DIM = 2
+hparams.ENCODER.MODEL = "NN"  # PCA OR NN
 
 hparams.TRAIN = CN()
 hparams.TRAIN.ITER = 5
