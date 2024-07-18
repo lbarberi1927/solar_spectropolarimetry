@@ -19,7 +19,7 @@ hparams.MODEL = CN()
 hparams.MODEL.KERNEL = "RBF"
 hparams.MODEL.PRIOR_MEAN = "CONSTANT"
 # hparams.MODEL.LIKELIHOOD = "GAUSSIAN"
-hparams.MODEL.MULTITASK = False
+hparams.MODEL.MULTITASK = True
 hparams.MODEL.OUTPUT_DIM = 1 if not hparams.MODEL.MULTITASK else 4
 
 hparams.ENCODE_DELTA_LAMBDA = True
