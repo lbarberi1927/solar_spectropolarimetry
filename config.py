@@ -13,7 +13,7 @@ hparams.SEED = 42
 
 hparams.OPTIMIZER = CN()
 hparams.OPTIMIZER.TYPE = 'adam'
-hparams.OPTIMIZER.LR = 1e-3
+hparams.OPTIMIZER.LR = 1e-2
 
 hparams.MODEL = CN()
 hparams.MODEL.KERNEL = "RBF"
@@ -30,7 +30,7 @@ hparams.ENCODER.LATENT_DIM = 1
 hparams.ENCODER.MODEL = "NN"  # PCA OR NN
 
 hparams.TRAIN = CN()
-hparams.TRAIN.ITER = 5
+hparams.TRAIN.ITER = 100
 hparams.TRAIN.FAST_RUN = False
 hparams.TRAIN.ROWS = 1000
 hparams.TRAIN.TEST_SIZE = 0.2

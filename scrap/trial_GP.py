@@ -3,7 +3,7 @@ from sklearn.gaussian_process import GaussianProcessRegressor
 from sklearn.gaussian_process.kernels import RBF, WhiteKernel
 import matplotlib.pyplot as plt
 
-data = np.loadtxt('../data/fe6302_lte4400g45v1_4000G_g150_c022.dat', skiprows=2)
+data = np.loadtxt('../data.nosync/fe6302_lte4400g45v1_4000G_g150_c022.dat', skiprows=2)
 
 n_samples = 100
 indices = np.random.choice(data.shape[0], size=n_samples, replace=False)
