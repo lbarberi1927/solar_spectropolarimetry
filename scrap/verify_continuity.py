@@ -3,7 +3,7 @@ import matplotlib.pyplot as plt
 import numpy as np
 import os
 
-from config import hparams, DATA_FOLDER
+from configs.GP_config import DATA_FOLDER
 from src.utils import get_project_root
 
 root = get_project_root()

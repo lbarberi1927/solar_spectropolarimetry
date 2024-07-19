@@ -1,5 +1,5 @@
 import gpytorch
-from config import hparams
+from configs.GP_config import hparams
 from src.models.gaussian_process.GP_params import prior_mean, kernel
 
 class ExactGPModel(gpytorch.models.ExactGP):

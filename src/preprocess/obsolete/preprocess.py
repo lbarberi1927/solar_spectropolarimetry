@@ -1,7 +1,7 @@
 import os
 import numpy as np
 from sklearn.model_selection import train_test_split
-from config import DATASET_PATH, hparams, DATA_FOLDER
+from configs.GP_config import DATASET_PATH, hparams, DATA_FOLDER
 from src.utils import get_project_root
 from sklearn.preprocessing import StandardScaler
 

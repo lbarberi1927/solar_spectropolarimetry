@@ -1,7 +1,7 @@
 import gpytorch
 import torch
 
-from config import hparams
+from configs.GP_config import hparams
 
 unitask_prior_mean = {
     "CONSTANT": gpytorch.means.ConstantMean(),

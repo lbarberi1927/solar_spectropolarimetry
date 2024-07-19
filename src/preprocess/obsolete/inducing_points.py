@@ -2,7 +2,7 @@ import os
 import numpy as np
 from sklearn.cluster import MiniBatchKMeans, KMeans
 
-from config import hparams, DATA_FOLDER
+from configs.GP_config import hparams, DATA_FOLDER
 from src.utils import get_project_root
 
 root = get_project_root()

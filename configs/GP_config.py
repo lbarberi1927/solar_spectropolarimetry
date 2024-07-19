@@ -2,8 +2,6 @@ import os
 from yacs.config import CfgNode as CN
 
 
-ROOT_DIR = os.path.dirname(os.path.abspath(__file__))
-
 DATA_FOLDER = 'data.nosync'
 DATASET_PATH = os.path.join(DATA_FOLDER, 'fe6302_basic.csv')
 
