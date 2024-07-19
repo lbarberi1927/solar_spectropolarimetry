@@ -2,7 +2,7 @@ import gpytorch
 import torch
 
 from config import hparams
-from src.models.GP_params import prior_mean, kernel
+from src.models.gaussian_process.GP_params import prior_mean, kernel
 
 
 class GPWithNNFeatureExtractor(gpytorch.models.ExactGP):

@@ -5,11 +5,17 @@ import torch
 from torch.utils.data import TensorDataset, DataLoader
 
 from config import hparams, DATA_FOLDER
-from src.models.gaussian_process_raw import ExactGPModel
-from src.models.gaussian_process_with_encoder import GPWithNNFeatureExtractor
-from src.models.variational_GP import SVGPModel, ConfigEncoder
+from src.models.gaussian_process.gaussian_process_with_encoder import GPWithNNFeatureExtractor
+from src.models.gaussian_process.variational_GP import SVGPModel, ConfigEncoder
 from src.utils import get_project_root
-from src.models.GP_params import likelihood
+from src.models.gaussian_process.GP_params import likelihood
+
+import gc
+
+gc.collect()
+torch.cuda.empty_cache()
+torch.backends.cuda.matmul.allow_tf32 = True
+torch.backends.cuda.matmul.allow_fp16_reduced_precision_reduction = True
 
 root = get_project_root()
 device = "cuda" if torch.cuda.is_available() else "cpu"
@@ -104,7 +110,7 @@ def train_variational_model(x_train, y_train, inducing_points):
             batch_x = batch_x.to(torch.device(device))
             batch_y = batch_y.to(torch.device(device))
             print(f"Batch: {n_batches}, {torch.cuda.memory_allocated()}", flush=True)
-            with torch.autocast(device_type=device, dtype=torch.float16):
+            with torch.cuda.amp.autocast():
                 optimizer.zero_grad()
                 output = model(batch_x)
                 loss = -mll(output, batch_y)
@@ -146,7 +152,14 @@ def load_data():
     else:
         y_train = torch.from_numpy(y_train[:, 0]).to(torch.float32)
 
-    return x_train, y_train
+    inducing_points = np.loadtxt(
+        os.path.join(root, DATA_FOLDER, "inducing_points.csv"), delimiter=",", max_rows=25000
+    )
+    inducing_points = torch.from_numpy(inducing_points).to(
+        torch.float32
+    )
+
+    return x_train, y_train, inducing_points
 
 
 def main():
@@ -163,23 +176,12 @@ def main():
         flush=True,
     )
 
-    torch.cuda.empty_cache()
-    torch.backends.cuda.matmul.allow_tf32 = True
-    torch.backends.cuda.matmul.allow_fp16_reduced_precision_reduction = True
-
     print(f"In the beninging: {torch.cuda.memory_allocated(), torch.cuda.mem_get_info()}")
 
-    x_train, y_train = load_data()
+    x_train, y_train, inducing_points = load_data()
 
     np.random.seed(hparams.SEED)
     torch.manual_seed(hparams.SEED)
-
-    inducing_points = np.loadtxt(
-        os.path.join(root, DATA_FOLDER, "inducing_points.csv"), delimiter=","
-    )
-    inducing_points = torch.from_numpy(inducing_points).to(
-        torch.float32
-    )  # .to(torch.device(device))
 
     if hparams.VARIATIONAL.ENABLE:
         train_variational_model(x_train, y_train, inducing_points)

@@ -4,7 +4,7 @@ import gpytorch
 import numpy as np
 import torch
 
-from src.models.gaussian_process_raw import ExactGPModel
+from src.models.gaussian_process.gaussian_process_raw import ExactGPModel
 from src.utils import get_project_root
 from config import hparams, DATA_FOLDER
 

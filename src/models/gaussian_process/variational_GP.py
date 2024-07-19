@@ -3,7 +3,7 @@ import gpytorch
 from torch import nn
 
 from config import hparams
-from src.models.GP_params import prior_mean, kernel
+from src.models.gaussian_process.GP_params import prior_mean, kernel
 
 
 # Define the neural network encoder
@@ -34,17 +34,28 @@ class ConfigEncoder(nn.Module):
 # Define the SVGP model
 class SVGPModel(gpytorch.models.ApproximateGP):
     def __init__(self, inducing_points):
-        variational_distribution = gpytorch.variational.MeanFieldVariationalDistribution(
-            inducing_points.size(-2),
-            batch_shape=torch.Size([hparams.MODEL.OUTPUT_DIM]),
-        )
-        variational_strategy = gpytorch.variational.IndependentMultitaskVariationalStrategy(
-            gpytorch.variational.VariationalStrategy(
-                self, inducing_points, variational_distribution, learn_inducing_locations=True
-            ),
-            num_tasks=hparams.MODEL.OUTPUT_DIM,
-        )
-        super(SVGPModel, self).__init__(variational_strategy)
+        if hparams.MODEL.MULTITASK:
+            variational_distribution = gpytorch.variational.MeanFieldVariationalDistribution(
+                inducing_points.size(-2),
+                batch_shape=torch.Size([hparams.MODEL.OUTPUT_DIM]),
+            )
+            variational_strategy = gpytorch.variational.IndependentMultitaskVariationalStrategy(
+                gpytorch.variational.VariationalStrategy(
+                    self, inducing_points, variational_distribution, learn_inducing_locations=True
+                ),
+                num_tasks=hparams.MODEL.OUTPUT_DIM,
+            )
+        else:
+            variational_distribution = gpytorch.variational.DeltaVariationalDistribution(
+                inducing_points.size(0)
+            )
+            variational_strategy = gpytorch.variational.VariationalStrategy(
+                self,
+                inducing_points,
+                variational_distribution,
+                learn_inducing_locations=True
+            )
+        super().__init__(variational_strategy)
         self.mean_module = prior_mean
         self.covar_module = kernel
 

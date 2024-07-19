@@ -9,7 +9,7 @@ unitask_prior_mean = {
 }
 
 unitask_kernel = {
-    "RBF": gpytorch.kernels.ScaleKernel(gpytorch.kernels.RBFKernel()),
+    "RBF": gpytorch.kernels.ScaleKernel(gpytorch.kernels.keops.RBFKernel()),
     "MATERN": gpytorch.kernels.ScaleKernel(gpytorch.kernels.MaternKernel()),
 }
 

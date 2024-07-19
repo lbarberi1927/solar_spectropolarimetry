@@ -19,14 +19,14 @@ hparams.MODEL = CN()
 hparams.MODEL.KERNEL = "RBF"
 hparams.MODEL.PRIOR_MEAN = "CONSTANT"
 # hparams.MODEL.LIKELIHOOD = "GAUSSIAN"
-hparams.MODEL.MULTITASK = True
+hparams.MODEL.MULTITASK = False
 hparams.MODEL.OUTPUT_DIM = 1 if not hparams.MODEL.MULTITASK else 4
 
-hparams.ENCODE_DELTA_LAMBDA = True
+hparams.ENCODE_DELTA_LAMBDA = False
 hparams.ENCODER = CN()
 hparams.ENCODER.INPUT_DIM = 4
 hparams.ENCODER.HIDDEN_DIM = 2
-hparams.ENCODER.LATENT_DIM = 2
+hparams.ENCODER.LATENT_DIM = 1
 hparams.ENCODER.MODEL = "NN"  # PCA OR NN
 
 hparams.TRAIN = CN()
@@ -42,7 +42,7 @@ hparams.TRAIN.EXISTING_NAME = "basic_configs/attempt_zero_5_iter.pth"
 hparams.VARIATIONAL = CN()
 hparams.VARIATIONAL.ENABLE = True
 hparams.VARIATIONAL.N_INDUCING_POINTS = 50000
-hparams.VARIATIONAL.BATCH_SIZE = 16
+hparams.VARIATIONAL.BATCH_SIZE = 32
 hparams.VARIATIONAL.EPOCHS = 5
 hparams.VARIATIONAL.K_MEANS_BATCH = 100000
 hparams.VARIATIONAL.INDUCING_ALGORITHM = "minibatch_kmeans"
