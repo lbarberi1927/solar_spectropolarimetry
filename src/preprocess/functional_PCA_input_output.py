@@ -50,7 +50,7 @@ def main():
     for profile in ["I", "Q", "U", "V"]:
         scores, params = get_fPCA_scores(profile, data, grid_points)
         np.savetxt(os.path.join(root, DATA_FOLDER, f"{profile}_scores.csv"), scores, delimiter=",")
-        np.save(os.path.join(root, DATA_FOLDER, f"{profile}_decomposition.npy"), params)
+        np.save(os.path.join(root, DATA_FOLDER, profile, f"{profile}_decomposition.npy"), params)
         # to read: read_dictionary = np.load('my_file.npy',allow_pickle='TRUE').item()
         print(f"saved {profile} scores")
 

@@ -10,9 +10,21 @@ from src.models.functional_neural_networks.MLP import MLP
 from src.utils import get_project_root
 
 root = get_project_root()
+np.random.seed(hparams.SEED)
+torch.manual_seed(hparams.SEED)
+device = "cuda" if torch.cuda.is_available() else "cpu"
 
-def train(train_loader):
+
+def train(train_loader, profile):
+    print(f"Training for profile {profile}", flush=True)
     model = MLP()
+    if hparams.TRAIN.PRE_TRAINED:
+        model_state_dict = torch.load(
+            os.path.join(root, "logs", profile, hparams.TRAIN.EXISTING_NAME)
+        )
+        model.load_state_dict(model_state_dict)
+
+    model = model.to(torch.device(device))
     model.train()
 
     criterion = torch.nn.MSELoss()
@@ -35,12 +47,21 @@ def train(train_loader):
             running_loss += loss.item()
 
         epoch_loss = running_loss / len(train_loader)
-        print(f'Epoch [{epoch + 1}/{hparams.TRAIN.EPOCHS}], Loss: {epoch_loss:.4f}')
+        print(f"Epoch [{epoch + 1}/{hparams.TRAIN.EPOCHS}], Loss: {epoch_loss:.4f}")
+
+    if hparams.TRAIN.SAVE_MODEL:
+        torch.save(
+            model.state_dict(), os.path.join(root, "logs", profile, hparams.TRAIN.NAME)
+        )
 
 
 def load_data(profile):
-    x = np.loadtxt(os.path.join(root, DATA_FOLDER, profile, "x_train.csv"), delimiter=",")
-    y = np.loadtxt(os.path.join(root, DATA_FOLDER, profile, "y_train.csv"), delimiter=",")
+    x = np.loadtxt(
+        os.path.join(root, DATA_FOLDER, profile, "x_train.csv"), delimiter=","
+    )
+    y = np.loadtxt(
+        os.path.join(root, DATA_FOLDER, profile, "y_train.csv"), delimiter=","
+    )
 
     x = torch.from_numpy(x).to(torch.float32)
     y = torch.from_numpy(y).to(torch.float32)
@@ -49,14 +70,26 @@ def load_data(profile):
 
 
 def main():
-    x, y = load_data("I")
-    train_loader = DataLoader(
-        TensorDataset(x, y),
-        batch_size=hparams.TRAIN.BATCH_SIZE,
-        shuffle=True,
+    print(
+        f"preparing training with params: \n"
+        f"Learning Rate: {hparams.TRAIN.LEARNING_RATE} \n"
+        f"NN Hidden Dimension: {hparams.MODEL.HIDDEN_DIM} \n"
+        f"Pre-Trained Model: {str(hparams.TRAIN.PRE_TRAINED)} \n"
+        f"Saving model: {str(hparams.TRAIN.SAVE_MODEL)} to {hparams.TRAIN.NAME} \n"
+        f"Device: {device} \n",
+        flush=True,
     )
-    train(train_loader)
+    for profile in ["I", "Q", "U", "V"]:
+        x, y = load_data(profile)
+        x = x.to(torch.device(device))
+        y = y.to(torch.device(device))
+        train_loader = DataLoader(
+            TensorDataset(x, y),
+            batch_size=hparams.TRAIN.BATCH_SIZE,
+            shuffle=True,
+        )
+        train(train_loader, profile)
 
 
-if __name__ == '__main__':
+if __name__ == "__main__":
     main()

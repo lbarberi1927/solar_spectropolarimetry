@@ -38,6 +38,5 @@ def main():
         print(f"saved {profile} data")
 
 
-
 if __name__ == '__main__':
     main()
