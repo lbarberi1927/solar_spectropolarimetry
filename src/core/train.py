@@ -54,9 +54,7 @@ def train(train_loader, profile):
     if hparams.TRAIN.SAVE_MODEL:
         save_path = os.path.join(root, "logs", profile, hparams.TRAIN.NAME)
         verify_path_exists(Path(save_path).parent)
-        torch.save(
-            model.state_dict(), save_path
-        )
+        torch.save(model.state_dict(), save_path)
 
 
 def load_data(profile):

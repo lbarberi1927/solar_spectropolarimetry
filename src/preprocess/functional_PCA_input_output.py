@@ -10,15 +10,16 @@ from src.utils import get_project_root, verify_path_exists
 
 root = get_project_root()
 
+
 def get_fPCA_scores(profile, data, grid_points):
     n_components = hparams.FPCA.N_COMPONENTS
-    if profile=="I":
+    if profile == "I":
         matrix = data[:, 5].reshape(-1, 301)
-    elif profile=="Q":
+    elif profile == "Q":
         matrix = data[:, 6].reshape(-1, 301)
-    elif profile=="U":
+    elif profile == "U":
         matrix = data[:, 7].reshape(-1, 301)
-    elif profile=="V":
+    elif profile == "V":
         matrix = data[:, 8].reshape(-1, 301)
 
     fdata = skfda.FDataGrid(data_matrix=matrix, grid_points=grid_points)
@@ -39,11 +40,11 @@ def main():
     data = np.loadtxt(DATASET_PATH, delimiter=",")
     grid_points = data[:301, 4].reshape(1, -1)
 
-    repetitions = int(len(data)/301)
+    repetitions = int(len(data) / 301)
     input = list()
 
     for k in range(repetitions):
-        input.append(data[k*301, :4])
+        input.append(data[k * 301, :4])
 
     input = np.array(input)
     save_folder = os.path.join(root, DATA_FOLDER)
@@ -55,11 +56,13 @@ def main():
         save_folder = os.path.join(root, DATA_FOLDER, profile)
         verify_path_exists(save_folder)
 
-        np.savetxt(os.path.join(save_folder, f"{profile}_scores.csv"), scores, delimiter=",")
+        np.savetxt(
+            os.path.join(save_folder, f"{profile}_scores.csv"), scores, delimiter=","
+        )
         np.save(os.path.join(save_folder, f"{profile}_decomposition.npy"), params)
 
         print(f"saved {profile} scores")
 
 
-if __name__ == '__main__':
+if __name__ == "__main__":
     main()

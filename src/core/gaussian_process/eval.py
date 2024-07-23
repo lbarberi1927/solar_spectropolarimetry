@@ -11,6 +11,7 @@ from configs.data import DATA_FOLDER
 
 root = get_project_root()
 
+
 def load_model(model_name):
     x_train_path = os.path.join(root, DATA_FOLDER, "x_train.csv")
     y_train_path = os.path.join(root, DATA_FOLDER, "y_train.csv")
@@ -30,6 +31,7 @@ def load_model(model_name):
 
     return model, likelihood
 
+
 def predict(model, likelihood, x):
     print("evaluating...")
 
@@ -48,5 +50,5 @@ def main():
     print(observed_preds.mean, observed_preds.variance, model.train_inputs[0])
 
 
-if __name__ == '__main__':
+if __name__ == "__main__":
     main()

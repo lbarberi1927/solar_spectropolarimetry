@@ -10,7 +10,11 @@ from src.models.gaussian_process.GP_params import prior_mean, kernel
 class ConfigEncoder(nn.Module):
     def __init__(self):
         super(ConfigEncoder, self).__init__()
-        input_dim = hparams.ENCODER.INPUT_DIM + 1 if hparams.ENCODE_DELTA_LAMBDA else hparams.ENCODER.INPUT_DIM
+        input_dim = (
+            hparams.ENCODER.INPUT_DIM + 1
+            if hparams.ENCODE_DELTA_LAMBDA
+            else hparams.ENCODER.INPUT_DIM
+        )
         self.fc1 = nn.Linear(input_dim, hparams.ENCODER.HIDDEN_DIM)
         self.fc2 = nn.Linear(hparams.ENCODER.HIDDEN_DIM, hparams.ENCODER.LATENT_DIM)
 
@@ -35,25 +39,34 @@ class ConfigEncoder(nn.Module):
 class SVGPModel(gpytorch.models.ApproximateGP):
     def __init__(self, inducing_points):
         if hparams.MODEL.MULTITASK:
-            variational_distribution = gpytorch.variational.MeanFieldVariationalDistribution(
-                inducing_points.size(-2),
-                batch_shape=torch.Size([hparams.MODEL.OUTPUT_DIM]),
+            variational_distribution = (
+                gpytorch.variational.MeanFieldVariationalDistribution(
+                    inducing_points.size(-2),
+                    batch_shape=torch.Size([hparams.MODEL.OUTPUT_DIM]),
+                )
             )
-            variational_strategy = gpytorch.variational.IndependentMultitaskVariationalStrategy(
-                gpytorch.variational.VariationalStrategy(
-                    self, inducing_points, variational_distribution, learn_inducing_locations=True
-                ),
-                num_tasks=hparams.MODEL.OUTPUT_DIM,
+            variational_strategy = (
+                gpytorch.variational.IndependentMultitaskVariationalStrategy(
+                    gpytorch.variational.VariationalStrategy(
+                        self,
+                        inducing_points,
+                        variational_distribution,
+                        learn_inducing_locations=True,
+                    ),
+                    num_tasks=hparams.MODEL.OUTPUT_DIM,
+                )
             )
         else:
-            variational_distribution = gpytorch.variational.DeltaVariationalDistribution(
-                inducing_points.size(0)
+            variational_distribution = (
+                gpytorch.variational.DeltaVariationalDistribution(
+                    inducing_points.size(0)
+                )
             )
             variational_strategy = gpytorch.variational.VariationalStrategy(
                 self,
                 inducing_points,
                 variational_distribution,
-                learn_inducing_locations=True
+                learn_inducing_locations=True,
             )
         super().__init__(variational_strategy)
         self.mean_module = prior_mean
@@ -63,4 +76,3 @@ class SVGPModel(gpytorch.models.ApproximateGP):
         mean_x = self.mean_module(x)
         covar_x = self.covar_module(x)
         return gpytorch.distributions.MultivariateNormal(mean_x, covar_x)
-

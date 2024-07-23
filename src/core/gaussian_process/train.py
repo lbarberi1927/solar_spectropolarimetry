@@ -8,7 +8,9 @@ from torch.utils.data import TensorDataset, DataLoader
 
 from configs.GP_config import hparams
 from configs.data import DATA_FOLDER
-from src.models.gaussian_process.gaussian_process_with_encoder import GPWithNNFeatureExtractor
+from src.models.gaussian_process.gaussian_process_with_encoder import (
+    GPWithNNFeatureExtractor,
+)
 from src.models.gaussian_process.variational_GP import SVGPModel, ConfigEncoder
 from src.utils import get_project_root, verify_path_exists
 from src.models.gaussian_process.GP_params import likelihood
@@ -105,7 +107,10 @@ def train_variational_model(x_train, y_train, inducing_points):
 
     model.train()
     likelihood.train()
-    print(f"Before training: {torch.cuda.memory_allocated()}, {torch.cuda.mem_get_info()}", flush=True)
+    print(
+        f"Before training: {torch.cuda.memory_allocated()}, {torch.cuda.mem_get_info()}",
+        flush=True,
+    )
 
     for epoch in range(hparams.VARIATIONAL.EPOCHS):
         n_batches = 0
@@ -158,11 +163,11 @@ def load_data():
         y_train = torch.from_numpy(y_train[:, 0]).to(torch.float32)
 
     inducing_points = np.loadtxt(
-        os.path.join(root, DATA_FOLDER, "inducing_points.csv"), delimiter=",", max_rows=25000
+        os.path.join(root, DATA_FOLDER, "inducing_points.csv"),
+        delimiter=",",
+        max_rows=25000,
     )
-    inducing_points = torch.from_numpy(inducing_points).to(
-        torch.float32
-    )
+    inducing_points = torch.from_numpy(inducing_points).to(torch.float32)
 
     return x_train, y_train, inducing_points
 
@@ -181,7 +186,9 @@ def main():
         flush=True,
     )
 
-    print(f"In the beninging: {torch.cuda.memory_allocated(), torch.cuda.mem_get_info()}")
+    print(
+        f"In the beninging: {torch.cuda.memory_allocated(), torch.cuda.mem_get_info()}"
+    )
 
     x_train, y_train, inducing_points = load_data()
 

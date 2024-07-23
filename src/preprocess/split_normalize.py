@@ -9,15 +9,25 @@ from src.utils import get_project_root, verify_path_exists
 
 root = get_project_root()
 
+
 def split(x, profile):
-    y = np.loadtxt(os.path.join(root, DATA_FOLDER, profile, f"{profile}_scores.csv"), delimiter=",")
+    y = np.loadtxt(
+        os.path.join(root, DATA_FOLDER, profile, f"{profile}_scores.csv"), delimiter=","
+    )
     x_train, x_test, y_train, y_test = train_test_split(
         x,
         y,
         test_size=hparams.TRAIN.TEST_SIZE,
         random_state=hparams.SEED,
     )
-    print("separated data: training - ", x_train.shape, y_train.shape, "testing - ", x_test.shape, y_test.shape)
+    print(
+        "separated data: training - ",
+        x_train.shape,
+        y_train.shape,
+        "testing - ",
+        x_test.shape,
+        y_test.shape,
+    )
 
     return x_train, x_test, y_train, y_test
 
@@ -42,5 +52,5 @@ def main():
         print(f"saved {profile} data")
 
 
-if __name__ == '__main__':
+if __name__ == "__main__":
     main()

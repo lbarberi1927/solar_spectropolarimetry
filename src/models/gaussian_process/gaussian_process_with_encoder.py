@@ -33,8 +33,10 @@ class GPWithNNFeatureExtractor(gpytorch.models.ExactGP):
         mean_x = self.mean_module(x)
         covar_x = self.covar_module(x)
         if hparams.MODEL.MULTITASK:
-            distribution = gpytorch.distributions.MultitaskMultivariateNormal.from_batch_mvn(
-                gpytorch.distributions.MultivariateNormal(mean_x, covar_x)
+            distribution = (
+                gpytorch.distributions.MultitaskMultivariateNormal.from_batch_mvn(
+                    gpytorch.distributions.MultivariateNormal(mean_x, covar_x)
+                )
             )
         else:
             distribution = gpytorch.distributions.MultivariateNormal(mean_x, covar_x)
