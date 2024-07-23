@@ -9,7 +9,8 @@ from src.utils import verify_path_exists
 
 home = expanduser("~")
 print(home)
-data_folder_path = os.path.join("~", SIRIUS_DATA_ORIGIN_FOLDER)
+data_folder_path = os.path.join(home, "..", SIRIUS_DATA_ORIGIN_FOLDER)
+print(data_folder_path)
 os.chdir(data_folder_path)
 print(os.getcwd())
 
