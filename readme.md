@@ -45,9 +45,10 @@ The data employed in our analysis is sourced from simulations ran by IRSOL - Ist
 To train the model, create the files and directories as specified in the `configs/data` file. This is very important to 
 specify both the directories from which to read the data and to save the preprocessed data for training.
 
-To prepare the data for training, run the following scripts.
+To prepare the data for training, run the following scripts. These are idealised to run locally or on a high-performance
+computing cluster. However, not on SIRIUS, as the computing capabilities are not sufficient to run the training.
 
-From the home directory of the SIRIUS cluster (or whichever cluster the raw data is stored in):
+From the home directory of the SIRIUS cluster:
 
 ```bash
 python3 -m src.preprocess.single_file_transfer

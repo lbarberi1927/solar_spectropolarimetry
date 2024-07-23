@@ -8,7 +8,8 @@ from configs.data import SIRIUS_DATA_ORIGIN_FOLDER, SIRIUS_DATA_DESTINATION_PATH
 from src.utils import verify_path_exists
 
 home = expanduser("~")
-data_folder_path = os.path.join(home, SIRIUS_DATA_ORIGIN_FOLDER)
+print(home)
+data_folder_path = os.path.join("~", SIRIUS_DATA_ORIGIN_FOLDER)
 os.chdir(data_folder_path)
 print(os.getcwd())
 
