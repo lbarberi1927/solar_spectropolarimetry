@@ -8,11 +8,8 @@ from configs.data import SIRIUS_DATA_ORIGIN_FOLDER, SIRIUS_DATA_DESTINATION_PATH
 from src.utils import verify_path_exists
 
 home = expanduser("~")
-print(home)
 data_folder_path = os.path.join(home, "..", SIRIUS_DATA_ORIGIN_FOLDER)
-print(data_folder_path)
 os.chdir(data_folder_path)
-print(os.getcwd())
 
 file_path = "fe6302_lte"
 feless_path = "_lte"
