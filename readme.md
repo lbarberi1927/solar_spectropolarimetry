@@ -40,6 +40,8 @@ cd solar_spectropolarimetry
 pip install -r requirements.txt
 ```
 
+To have the environment on SIRIUS, I recommend to set up an SFTP connection and transfer the repository to the cluster.
+
 ## Data
 The data employed in our analysis is sourced from simulations ran by IRSOL - Istituto Ricerche Solari Locarno.
 To train the model, create the files and directories as specified in the `configs/data` file. This is very important to 
@@ -48,14 +50,15 @@ specify both the directories from which to read the data and to save the preproc
 To prepare the data for training, run the following scripts. These are idealised to run locally or on a high-performance
 computing cluster. However, not on SIRIUS, as the computing capabilities are not sufficient to run the training.
 
-From the home directory of the SIRIUS cluster:
+From your directory in the SIRIUS cluster:
 
 ```bash
 python3 -m src.preprocess.single_file_transfer
 ```
 
-If you wish to run the training locally, you must then download the preprocessed data to your local machine. The name of 
-the file is specified in the `configs/data.py` file.
+You must then download the preprocessed data to your local machine, either using scp or by setting up an SFTP connection. The name of 
+the file is specified in the `configs/data.py` file. It is important that the file is saved in the same relative directory as the
+as in SIRIUS.
 Next, run the following scripts to finish preprocessing the data:
 
 ```bash

@@ -78,7 +78,6 @@ for g in g_conf:
 
 
 all_data = np.vstack(all_data)
-print(all_data.shape)
 
 print(f"saving to {SIRIUS_DATA_DESTINATION_PATH} on sirius")
 sink = os.path.join(home, SIRIUS_DATA_DESTINATION_PATH)
