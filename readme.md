@@ -41,6 +41,17 @@ cd solar_spectropolarimetry
 pip install -r requirements.txt
 ```
 
+## Training
+To train the deep learning model, a sbatch script is provided to run the training on a high-performance computing cluster.
+Run the following commands from the source directory to train the model:
+
+```bash
+sbatch runner.sh
+```
+
+Training configurations can be modified in the `configs/NN_config.py` file. The computing resources needed for training 
+are specified in the `runner.sh` script.
+
 ## Deployment
 To calculate the four components (I, Q, U, V) of the Stokes vector, given a set of input physical parameters, run the 
 following commands and follow the instructions on the API interface:
