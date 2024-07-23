@@ -4,8 +4,9 @@ import numpy as np
 import skfda
 from skfda.preprocessing.dim_reduction import FPCA
 
-from configs.NN_config import hparams, DATA_FOLDER
-from src.utils import get_project_root
+from configs.NN_config import hparams
+from configs.data import DATASET_PATH, DATA_FOLDER
+from src.utils import get_project_root, verify_path_exists
 
 root = get_project_root()
 
@@ -35,7 +36,7 @@ def get_fPCA_scores(profile, data, grid_points):
 
 def main():
     # Load the data
-    data = np.loadtxt(os.path.join(root, DATA_FOLDER, 'fe6302_basic.csv'), delimiter=",")
+    data = np.loadtxt(DATASET_PATH, delimiter=",")
     grid_points = data[:301, 4].reshape(1, -1)
 
     repetitions = int(len(data)/301)
@@ -45,13 +46,18 @@ def main():
         input.append(data[k*301, :4])
 
     input = np.array(input)
-    np.savetxt(os.path.join(root, DATA_FOLDER, "variables.csv"), input, delimiter=",")
+    save_folder = os.path.join(root, DATA_FOLDER)
+    verify_path_exists(save_folder)
+    np.savetxt(os.path.join(save_folder, "variables.csv"), input, delimiter=",")
 
     for profile in ["I", "Q", "U", "V"]:
         scores, params = get_fPCA_scores(profile, data, grid_points)
-        np.savetxt(os.path.join(root, DATA_FOLDER, f"{profile}_scores.csv"), scores, delimiter=",")
-        np.save(os.path.join(root, DATA_FOLDER, profile, f"{profile}_decomposition.npy"), params)
-        # to read: read_dictionary = np.load('my_file.npy',allow_pickle='TRUE').item()
+        save_folder = os.path.join(root, DATA_FOLDER, profile)
+        verify_path_exists(save_folder)
+
+        np.savetxt(os.path.join(save_folder, f"{profile}_scores.csv"), scores, delimiter=",")
+        np.save(os.path.join(save_folder, f"{profile}_decomposition.npy"), params)
+
         print(f"saved {profile} scores")
 
 

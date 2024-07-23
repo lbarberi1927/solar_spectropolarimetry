@@ -3,13 +3,12 @@ import matplotlib.pyplot as plt
 import numpy as np
 import os
 
-from configs.GP_config import DATA_FOLDER
+from configs.data import DATASET_PATH
 from src.utils import get_project_root
 
 root = get_project_root()
 
-all_data = np.loadtxt(os.path.join(root, DATA_FOLDER, "fe6302_basic.csv"), delimiter=",")
-print("yo")
+all_data = np.loadtxt(DATASET_PATH, delimiter=",")
 
 #%%
 fix_dl = 0

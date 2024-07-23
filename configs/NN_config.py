@@ -1,7 +1,5 @@
 from yacs.config import CfgNode as CN
 
-DATA_FOLDER = 'data.nosync'
-
 hparams = CN()
 
 hparams.SEED = 42

@@ -3,8 +3,9 @@ import os
 import numpy as np
 from sklearn.model_selection import train_test_split
 from sklearn.preprocessing import StandardScaler
-from configs.NN_config import hparams, DATA_FOLDER
-from src.utils import get_project_root
+from configs.NN_config import hparams
+from configs.data import DATA_FOLDER
+from src.utils import get_project_root, verify_path_exists
 
 root = get_project_root()
 
@@ -31,10 +32,13 @@ def main():
         x_train, x_test, y_train, y_test = split(x, profile)
         print(f"split {profile} data")
         print("saving data...")
-        np.savetxt(os.path.join(root, DATA_FOLDER, profile, f"x_train.csv"), x_train, delimiter=",")
-        np.savetxt(os.path.join(root, DATA_FOLDER, profile, f"x_test.csv"), x_test, delimiter=",")
-        np.savetxt(os.path.join(root, DATA_FOLDER, profile, f"y_train.csv"), y_train, delimiter=",")
-        np.savetxt(os.path.join(root, DATA_FOLDER, profile, f"y_test.csv"), y_test, delimiter=",")
+        save_folder = os.path.join(root, DATA_FOLDER, profile)
+        verify_path_exists(save_folder)
+
+        np.savetxt(os.path.join(save_folder, f"x_train.csv"), x_train, delimiter=",")
+        np.savetxt(os.path.join(save_folder, f"x_test.csv"), x_test, delimiter=",")
+        np.savetxt(os.path.join(save_folder, f"y_train.csv"), y_train, delimiter=",")
+        np.savetxt(os.path.join(save_folder, f"y_test.csv"), y_test, delimiter=",")
         print(f"saved {profile} data")
 
 

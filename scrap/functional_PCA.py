@@ -5,13 +5,13 @@ import skfda
 from skfda.preprocessing.dim_reduction import FPCA
 import matplotlib.pyplot as plt
 
-from configs.GP_config import DATA_FOLDER
+from configs.data import DATASET_PATH
 from src.utils import get_project_root
 
 root = get_project_root()
 
 # Load the data
-data = np.loadtxt(os.path.join(root, DATA_FOLDER, 'fe6302_basic.csv'), delimiter=",")
+data = np.loadtxt(DATASET_PATH, delimiter=",")
 
 matrix = data[:, 5].reshape(-1, 301)
 grid_points = data[:301, 4].reshape(1, -1)

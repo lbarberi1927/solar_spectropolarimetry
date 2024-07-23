@@ -8,7 +8,8 @@ from src.models.gaussian_process.gaussian_process_raw import ExactGPModel
 from src.models.gaussian_process.GP_params import likelihood
 
 from src.utils import get_project_root
-from configs.GP_config import DATA_FOLDER, hparams
+from configs.GP_config import hparams
+from configs.data import DATA_FOLDER
 
 root = get_project_root()
 device = "cuda" if torch.cuda.is_available() else "cpu"

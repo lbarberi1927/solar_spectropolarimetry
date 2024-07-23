@@ -6,7 +6,8 @@ from skfda.preprocessing.dim_reduction import FPCA
 from torch.utils.data import DataLoader, TensorDataset
 import matplotlib.pyplot as plt
 
-from configs.NN_config import DATA_FOLDER, hparams
+from configs.NN_config import hparams
+from configs.data import DATA_FOLDER
 from src.models.functional_neural_networks.MLP import MLP
 from src.utils import get_project_root
 

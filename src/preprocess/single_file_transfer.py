@@ -1,8 +1,15 @@
 import os
-import numpy as np
+from pathlib import Path
 
-new_path = os.path.join(os.getcwd(), '../../../sveta/syntspec/fe6302/')
-os.chdir(new_path)
+import numpy as np
+from os.path import expanduser
+
+from configs.data import SIRIUS_DATA_ORIGIN_FOLDER, SIRIUS_DATA_DESTINATION_PATH
+from src.utils import verify_path_exists
+
+home = expanduser("~")
+data_folder_path = os.path.join(home, SIRIUS_DATA_ORIGIN_FOLDER)
+os.chdir(data_folder_path)
 print(os.getcwd())
 
 file_path = "fe6302_lte"
@@ -40,6 +47,7 @@ for g in g_conf:
 all_data = np.vstack(all_data)
 print(all_data.shape)
 
-print("saving to barberi")
-sink = os.path.join(os.getcwd(), '../../../barberi/data/fe6302_basic.csv')
+print(f"saving to {SIRIUS_DATA_DESTINATION_PATH} on sirius")
+sink = os.path.join(home, SIRIUS_DATA_DESTINATION_PATH)
+verify_path_exists(Path(sink).parent)
 np.savetxt(sink, all_data, delimiter=",")

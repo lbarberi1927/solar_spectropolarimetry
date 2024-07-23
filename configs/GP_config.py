@@ -2,9 +2,6 @@ import os
 from yacs.config import CfgNode as CN
 
 
-DATA_FOLDER = 'data.nosync'
-DATASET_PATH = os.path.join(DATA_FOLDER, 'fe6302_basic.csv')
-
 hparams = CN()
 
 hparams.SEED = 42

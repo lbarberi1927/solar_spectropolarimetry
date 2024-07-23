@@ -1,13 +1,15 @@
 # Training function
 import os
+from pathlib import Path
 
 import numpy as np
 import torch
 from torch.utils.data import DataLoader, TensorDataset
 
-from configs.NN_config import hparams, DATA_FOLDER
+from configs.NN_config import hparams
+from configs.data import DATA_FOLDER
 from src.models.functional_neural_networks.MLP import MLP
-from src.utils import get_project_root
+from src.utils import get_project_root, verify_path_exists
 
 root = get_project_root()
 np.random.seed(hparams.SEED)
@@ -50,8 +52,10 @@ def train(train_loader, profile):
         print(f"Epoch [{epoch + 1}/{hparams.TRAIN.EPOCHS}], Loss: {epoch_loss:.4f}")
 
     if hparams.TRAIN.SAVE_MODEL:
+        save_path = os.path.join(root, "logs", profile, hparams.TRAIN.NAME)
+        verify_path_exists(Path(save_path).parent)
         torch.save(
-            model.state_dict(), os.path.join(root, "logs", profile, hparams.TRAIN.NAME)
+            model.state_dict(), save_path
         )
 
 

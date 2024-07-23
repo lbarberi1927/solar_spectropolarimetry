@@ -6,7 +6,8 @@ import torch
 
 from src.models.gaussian_process.gaussian_process_raw import ExactGPModel
 from src.utils import get_project_root
-from configs.GP_config import hparams, DATA_FOLDER
+from configs.GP_config import hparams
+from configs.data import DATA_FOLDER
 
 root = get_project_root()
 

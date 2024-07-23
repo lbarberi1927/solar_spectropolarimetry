@@ -5,7 +5,9 @@ from sklearn.preprocessing import StandardScaler
 from sklearn.model_selection import train_test_split
 from sklearn.decomposition import PCA
 
-data = np.loadtxt('../data/fe6302_basic.csv', delimiter=",")
+from configs.data import DATASET_PATH
+
+data = np.loadtxt(DATASET_PATH, delimiter=",")
 print("read data: ", data.shape)
 
 x = data[:, :5]

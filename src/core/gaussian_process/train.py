@@ -1,13 +1,16 @@
 import os
+from pathlib import Path
+
 import gpytorch
 import numpy as np
 import torch
 from torch.utils.data import TensorDataset, DataLoader
 
-from configs.GP_config import hparams, DATA_FOLDER
+from configs.GP_config import hparams
+from configs.data import DATA_FOLDER
 from src.models.gaussian_process.gaussian_process_with_encoder import GPWithNNFeatureExtractor
 from src.models.gaussian_process.variational_GP import SVGPModel, ConfigEncoder
-from src.utils import get_project_root
+from src.utils import get_project_root, verify_path_exists
 from src.models.gaussian_process.GP_params import likelihood
 
 import gc
@@ -50,7 +53,9 @@ def train_standard_model(x_train, y_train):
             optimizer.step()
 
     if hparams.TRAIN.SAVE_MODEL:
-        torch.save(model.state_dict(), os.path.join(root, "logs", hparams.TRAIN.NAME))
+        save_path = os.path.join(root, "logs", hparams.TRAIN.NAME)
+        verify_path_exists(Path(save_path).parent)
+        torch.save(model.state_dict(), save_path)
 
 
 def train_variational_model(x_train, y_train, inducing_points):
