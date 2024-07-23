@@ -44,6 +44,7 @@ def load_data(profile):
 
 def plot(model, x, y, profile):
     index = np.random.randint(0, len(x))
+    print(index)
     x = x[index].unsqueeze(0)
     y = y[index].numpy()
 

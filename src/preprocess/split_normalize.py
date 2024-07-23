@@ -1,5 +1,6 @@
 import os
 
+import joblib
 import numpy as np
 from sklearn.model_selection import train_test_split
 from sklearn.preprocessing import StandardScaler
@@ -37,6 +38,8 @@ def main():
     print("normalizing data...")
     scaler = StandardScaler()
     x = scaler.fit_transform(x)
+
+    joblib.dump(scaler, os.path.join(root, DATA_FOLDER, "scaler.pkl"))
 
     for profile in ["I", "Q", "U", "V"]:
         x_train, x_test, y_train, y_test = split(x, profile)
