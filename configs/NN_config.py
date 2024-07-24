@@ -1,5 +1,7 @@
 from yacs.config import CfgNode as CN
 
+SAVE_FOLDER = "logs"
+
 hparams = CN()
 
 hparams.SEED = 42

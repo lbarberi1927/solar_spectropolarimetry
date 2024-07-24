@@ -6,7 +6,7 @@ from skfda.preprocessing.dim_reduction import FPCA
 from torch.utils.data import DataLoader, TensorDataset
 import matplotlib.pyplot as plt
 
-from configs.NN_config import hparams
+from configs.NN_config import hparams, SAVE_FOLDER
 from configs.data import DATA_FOLDER
 from src.models.functional_neural_networks.MLP import MLP
 from src.utils import get_project_root
@@ -85,7 +85,7 @@ def main():
             shuffle=False,
         )
         model_state_dict = torch.load(
-            os.path.join(root, "logs", profile, hparams.EVAL.NAME)
+            os.path.join(root, SAVE_FOLDER, profile, hparams.EVAL.NAME)
         )
         model = MLP()
         model.load_state_dict(model_state_dict)

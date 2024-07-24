@@ -60,8 +60,8 @@ def predict():
         with torch.no_grad():
             scores = model(input_array)
         scores = scores.numpy()
-        I_preds = fpca.inverse_transform(scores)
-        prediction.append(I_preds)
+        preds = fpca.inverse_transform(scores)
+        prediction.append(preds)
 
     # prediction = np.array(prediction).reshape(-1)
 

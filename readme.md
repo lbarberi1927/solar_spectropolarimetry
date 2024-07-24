@@ -32,7 +32,7 @@ The figures below illustrate various aspects of the structures analyzed in the s
 
 
 ## Installation
-To reproduce the analysis environment, you will need Python 3.6 or later. Please install the required Python packages listed in `requirements.txt`.
+To reproduce the analysis environment, you will need Python 3.9 or later. Please install the required Python packages listed in `requirements.txt`.
 
 ```bash
 git clone git@github.com:lbarberi1927/solar_spectropolarimetry.git
@@ -50,13 +50,13 @@ specify both the directories from which to read the data and to save the preproc
 To prepare the data for training, run the following scripts. These are idealised to run locally or on a high-performance
 computing cluster. However, not on SIRIUS, as the computing capabilities are not sufficient to run the training.
 
-From your directory in the SIRIUS cluster:
+From the source directory of the repository in the SIRIUS cluster:
 
 ```bash
 python3 -m src.preprocess.single_file_transfer
 ```
 
-You must then download the preprocessed data to your local machine, either using scp or by setting up an SFTP connection. The name of 
+You must then download the preprocessed data to your local machine, either using scp or with the SFTP connection. The name of 
 the file is specified in the `configs/data.py` file. It is important that the file is saved in the same relative directory as the
 as in SIRIUS.
 Next, run the following scripts to finish preprocessing the data:
@@ -80,13 +80,13 @@ sbatch runner.sh
 Training configurations can be modified in the `configs/NN_config.py` file. The computing resources needed for training 
 are specified in the `runner.sh` script.
 
-If you wish to run training locally, simply run the following command:
+If you wish to run training locally (recommended), simply run the following command:
 
 ```bash
 python3 -m src.core.train
 ```
 
-The trained model will be saved in the `logs` directory, under the name specified in the `configs/NN_config.py` file.
+The trained model will be saved in the `logs` directory, as specified in `configs/NN_config.py`.
 
 ## Deployment
 To calculate the four components (I, Q, U, V) of the Stokes vector, given a set of input physical parameters, run the 
