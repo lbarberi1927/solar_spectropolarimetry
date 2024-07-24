@@ -12,47 +12,34 @@ data_folder_path = os.path.join(home, "..", SIRIUS_DATA_ORIGIN_FOLDER)
 os.chdir(data_folder_path)
 
 file_path = "fe6302_lte"
-feless_path = "_lte"
-g_conf = [
-    "4000",
-    "4100",
-    "4200",
-    "4300",
-    "4400",
-    "4500",
-    "4600",
-    "4700",
-    "4800",
-    "4900",
-    "5000",
-    "5100",
-    "5200",
-    "5400",
-    "5500",
-    "5600",
-    "5700",
-    "5800",
-    "5900",
-    "6000",
-]
+
+low_temp = 4000
+high_temp = 4300
+temp_step = 100
+temperatures = np.arange(low_temp, high_temp + 1, temp_step)
+g_conf = [str(t).zfill(4) for t in temperatures]
+
 # + g45v1_
-G_conf = [
-    "0000",
-    "0500",
-    "1000",
-    "1500",
-    "2000",
-    "2500",
-    "3000",
-    "3500",
-    "4000",
-    "4500",
-    "5000",
-]
+low_mag_strength = 0
+high_mag_strength = 5000
+mag_strength_step = 200
+mag_strengths = np.arange(low_mag_strength, high_mag_strength + 1, mag_strength_step)
+G_conf = [str(g).zfill(4) for g in mag_strengths]
+
 # G_g
-g_2_conf = ["000", "030", "060", "090", "120", "150", "180"]
+low_gamma = 0
+high_gamma = 180
+gamma_step = 5
+#gammas = np.arange(low_gamma, high_gamma + 1, gamma_step)
+gammas = [0, 20, 45, 65, 90, 110, 135, 155, 180]
+g_2_conf = [str(g).zfill(3) for g in gammas]
+
 # _c
-c_conf = ["000", "022", "045", "067", "090", "112", "135", "157", "180"]
+low_xi = 0
+high_xi = 180
+xi_step = 11.25
+xis = np.arange(low_xi, high_xi + 1, xi_step)
+c_conf = [str(int(c)).zfill(3) for c in xis]
 
 all_data = list()
 
@@ -61,10 +48,6 @@ for g in g_conf:
         for g_2 in g_2_conf:
             for c in c_conf:
                 file = file_path + g + "g45v1_" + G + "G_g" + g_2 + "_c" + c + ".dat"
-                if not os.path.exists(file):
-                    file = (
-                        feless_path + g + "g45v1_" + G + "G_g" + g_2 + "_c" + c + ".dat"
-                    )
                 try:
                     data = np.loadtxt(file, skiprows=2)
                 except:

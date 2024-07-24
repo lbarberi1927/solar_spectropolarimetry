@@ -5,7 +5,7 @@ import skfda
 from skfda.preprocessing.dim_reduction import FPCA
 
 from configs.NN_config import hparams
-from configs.data import DATASET_PATH, DATA_FOLDER
+from configs.data import DATASET_PATH, DATA_FOLDER, FUNCTION_DOMAIN_POINTS
 from src.utils import get_project_root, verify_path_exists
 
 root = get_project_root()
@@ -14,14 +14,15 @@ root = get_project_root()
 def get_fPCA_scores(profile, data, grid_points):
     n_components = hparams.FPCA.N_COMPONENTS
     if profile == "I":
-        matrix = data[:, 5].reshape(-1, 301)
+        matrix = data[:, 5].reshape(-1, FUNCTION_DOMAIN_POINTS)
     elif profile == "Q":
-        matrix = data[:, 6].reshape(-1, 301)
+        matrix = data[:, 6].reshape(-1, FUNCTION_DOMAIN_POINTS)
     elif profile == "U":
-        matrix = data[:, 7].reshape(-1, 301)
+        matrix = data[:, 7].reshape(-1, FUNCTION_DOMAIN_POINTS)
     elif profile == "V":
-        matrix = data[:, 8].reshape(-1, 301)
+        matrix = data[:, 8].reshape(-1, FUNCTION_DOMAIN_POINTS)
 
+    print(f"computing fPCA for profile {profile}...")
     fdata = skfda.FDataGrid(data_matrix=matrix, grid_points=grid_points)
     fpca = FPCA(n_components=n_components)
     scores = fpca.fit_transform(fdata)
@@ -37,18 +38,20 @@ def get_fPCA_scores(profile, data, grid_points):
 
 def main():
     # Load the data
-    data = np.loadtxt(DATASET_PATH, delimiter=",")
-    grid_points = data[:301, 4].reshape(1, -1)
+    print("loading data...")
+    data = np.loadtxt(os.path.join(root, DATASET_PATH), delimiter=",")
+    grid_points = data[:FUNCTION_DOMAIN_POINTS, 4].reshape(1, -1)
 
-    repetitions = int(len(data) / 301)
+    repetitions = int(len(data) / FUNCTION_DOMAIN_POINTS)
     input = list()
 
     for k in range(repetitions):
-        input.append(data[k * 301, :4])
+        input.append(data[k * FUNCTION_DOMAIN_POINTS, :4])
 
     input = np.array(input)
     save_folder = os.path.join(root, DATA_FOLDER)
     verify_path_exists(save_folder)
+    print("saving variables...")
     np.savetxt(os.path.join(save_folder, "variables.csv"), input, delimiter=",")
 
     for profile in ["I", "Q", "U", "V"]:

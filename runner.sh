@@ -5,7 +5,6 @@
 #SBATCH --time=10:00:00
 #SBATCH --partition=gpu
 #SBATCH --gres=gpu:1
-#SBATCH --nodelist=icsnode06
 
 # # Send some noteworthy information to the output log
 echo "Running on node: $(hostname)"

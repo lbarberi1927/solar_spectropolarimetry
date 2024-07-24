@@ -25,7 +25,7 @@ def evaluate(model, test_loader):
             total_loss += loss.item()
 
         avg_loss = total_loss / len(test_loader)
-        print(f"Test Loss: {avg_loss:.4f}")
+        print(f"Test Loss: {avg_loss:.8f}")
 
 
 def load_data(profile):
@@ -42,9 +42,7 @@ def load_data(profile):
     return x, y
 
 
-def plot(model, x, y, profile):
-    index = np.random.randint(0, len(x))
-    print(index)
+def plot(model, x, y, profile, index):
     x = x[index].unsqueeze(0)
     y = y[index].numpy()
 
@@ -72,10 +70,14 @@ def plot(model, x, y, profile):
 
         ax.set_title(f"{profile}")
         ax.legend()
+        ax.set_xlim(-1.5, 1.5)
+        ax.set_ylim(-1, 1)
         plt.show()
 
 
 def main():
+    index = np.random.randint(0, 10000)
+    print(index)
     for profile in ["I", "Q", "U", "V"]:
         print(f"evaluating profile {profile}")
         x, y = load_data(profile)
@@ -92,7 +94,7 @@ def main():
         evaluate(model, test_loader)
 
         if hparams.EVAL.PLOT:
-            plot(model, x, y, profile)
+            plot(model, x, y, profile, index)
 
 
 if __name__ == "__main__":

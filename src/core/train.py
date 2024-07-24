@@ -49,9 +49,12 @@ def train(train_loader, profile):
             running_loss += loss.item()
 
         epoch_loss = running_loss / len(train_loader)
-        print(f"Epoch [{epoch + 1}/{hparams.TRAIN.EPOCHS}], Loss: {epoch_loss:.4f}")
+        print(f"Epoch [{epoch + 1}/{hparams.TRAIN.EPOCHS}], Loss: {epoch_loss:.8f}")
 
     if hparams.TRAIN.SAVE_MODEL:
+        if device == "cuda":
+            model = model.cpu()
+
         save_path = os.path.join(root, SAVE_FOLDER, profile, hparams.TRAIN.NAME)
         verify_path_exists(Path(save_path).parent)
         torch.save(model.state_dict(), save_path)
