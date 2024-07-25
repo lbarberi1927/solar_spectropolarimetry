@@ -3,6 +3,7 @@ import os
 import numpy as np
 import skfda
 from skfda.preprocessing.dim_reduction import FPCA
+from skfda.misc.scoring import mean_absolute_percentage_error
 
 from configs.NN_config import hparams
 from configs.data import DATASET_PATH, DATA_FOLDER, FUNCTION_DOMAIN_POINTS
@@ -11,7 +12,7 @@ from src.utils import get_project_root, verify_path_exists
 root = get_project_root()
 
 
-def get_fPCA_scores(profile, data, grid_points):
+def get_fPCA_scores(profile, data, grid_points, evaluate=True):
     n_components = hparams.FPCA.N_COMPONENTS
     if profile == "I":
         matrix = data[:, 5].reshape(-1, FUNCTION_DOMAIN_POINTS)
@@ -33,7 +34,18 @@ def get_fPCA_scores(profile, data, grid_points):
         "singular_values": fpca.singular_values_,
     }
 
+    if evaluate:
+        evaluate_reconstructions(fpca, fdata, scores, profile)
+
     return scores, fpca_params
+
+
+def evaluate_reconstructions(fpca, fdata, scores, profile):
+    print("evaluating fPCA reconstructions for profile", profile)
+    reconstructions = fpca.inverse_transform(scores)
+    MAPE = mean_absolute_percentage_error(fdata, reconstructions)
+    print(f"Mean Absolute Percentage Error for {profile}:", MAPE)
+
 
 
 def main():

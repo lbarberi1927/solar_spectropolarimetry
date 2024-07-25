@@ -56,18 +56,22 @@ From the source directory of the repository in the SIRIUS cluster:
 python3 -m src.preprocess.single_file_transfer
 ```
 
-You must then download the preprocessed data to your local machine, either using scp or with the SFTP connection. The name of 
-the file is specified in the `configs/data.py` file. It is important that the file is saved in the same relative directory as the
-as in SIRIUS.
-Next, run the following scripts to finish preprocessing the data:
+You must then download the preprocessed data to your local machine, or to a computing cluster, for example using the `scp` command:
 
 ```bash
-python3 -m src.preprocess.functional_PCA_input_output
-python3 -m src.preprocess.split_normalize
+scp username@sirius:/path/to/data/on/sirius username@rosa.usi.ch:/path/to/data_destination
 ```
 
-Your data folder will now be populated with a directory for each stokes profile, and each directory will contain the
-input and output data for the deep learning model, already split for training and testing.
+It is important that the file is saved in the same relative directory as in SIRIUS. The file name is specified in the `configs/data.py` file.
+Next, run the following script locally or on the computing cluster to finish preprocessing the data:
+
+```bash
+python3 -m src.preprocess.preprocess
+```
+
+Your data folder will now be populated with a directory for each stokes profile. Each directory will contain the
+labels for the deep learning model, while the input variables are saved in the parent folder, since they are shared for 
+all profiles. Both input and response variables are already split for training and testing.
 
 ## Training
 To train the deep learning model, a sbatch script is provided to run the training on a high-performance computing cluster.

@@ -5,4 +5,3 @@ matplotlib==3.9.1
 torch==2.2.2
 threadpoolctl==3.1.0
 scikit-fda==0.9.1
-flask==3.0.3
