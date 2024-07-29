@@ -23,7 +23,7 @@ hparams.TRAIN.LEARNING_RATE = 1e-3
 hparams.TRAIN.BATCH_SIZE = 64
 hparams.TRAIN.PRE_TRAINED = False
 hparams.TRAIN.SAVE_MODEL = True
-hparams.TRAIN.NAME = "dl_pm1p5/4_55_55_14_nn_10_epochs.pth"
+hparams.TRAIN.NAME = "increased_temp_range/4_55_55_14_nn_10_epochs.pth"
 hparams.TRAIN.EXISTING_NAME = "basic_nn_5_epochs.pth"
 
 hparams.EVAL = CN()
@@ -31,3 +31,6 @@ hparams.EVAL.BATCH_SIZE = 32
 hparams.EVAL.NAME = hparams.TRAIN.NAME
 hparams.EVAL.PLOT = True
 hparams.EVAL.EXTENDED_EVAL = True
+
+hparams.DEPLOYMENT = CN()
+hparams.DEPLOYMENT.MODEL_NAME = hparams.EVAL.NAME

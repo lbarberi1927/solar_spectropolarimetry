@@ -50,7 +50,7 @@ def split(x, y):
     return x_train, x_test, y_train, y_test
 
 
-def get_fPCA_scores(profile, y_train, y_test, grid_points, evaluate=True):
+def get_fPCA_scores(profile, y_train, y_test, grid_points, evaluate=False):
     n_components = hparams.FPCA.N_COMPONENTS
     train_matrix = separate_response(y_train, profile)
     test_matrix = separate_response(y_test, profile)
@@ -63,16 +63,10 @@ def get_fPCA_scores(profile, y_train, y_test, grid_points, evaluate=True):
     train_scores = fpca.fit_transform(fdata_train)
     test_scores = fpca.transform(fdata_test)
 
-    fpca_params = {
-        "components_": fpca.components_,
-        "mean_": fpca.mean_,
-        "singular_values": fpca.singular_values_,
-    }
-
     if evaluate:
         evaluate_reconstructions(fpca, fdata_test, test_scores, profile)
 
-    return train_scores, test_scores, fpca_params
+    return train_scores, test_scores, fpca
 
 
 def evaluate_reconstructions(fpca, fdata, scores, profile):
@@ -96,7 +90,7 @@ def separate_response(data, profile):
 
 
 def main():
-
+    """
     # Load the data
     print("loading data...")
     data = np.loadtxt(os.path.join(root, DATASET_PATH), delimiter=",")
@@ -123,9 +117,9 @@ def main():
     y_obs_train = np.load(os.path.join(root, DATA_FOLDER, "y_obs_train.npy"))
     y_obs_test = np.load(os.path.join(root, DATA_FOLDER, "y_obs_test.npy"))
     grid_points = np.loadtxt(os.path.join(root, DATA_FOLDER, "grid_points.csv"), delimiter=",")
-    """
+
     for profile in ["I", "Q", "U", "V"]:
-        train_scores, test_scores, params = get_fPCA_scores(profile, y_obs_train, y_obs_test, grid_points)
+        train_scores, test_scores, fpca = get_fPCA_scores(profile, y_obs_train, y_obs_test, grid_points)
         prof_obs_test = separate_response(y_obs_test, profile)
 
         print(f"saving {profile} scores...")
@@ -140,7 +134,7 @@ def main():
         np.savetxt(
             os.path.join(save_folder, f"y_obs_test.csv"), prof_obs_test, delimiter=","
         )
-        np.save(os.path.join(save_folder, f"{profile}_decomposition.npy"), params)
+        joblib.dump(fpca, os.path.join(save_folder, f"fpca.pkl"))
 
 
 if __name__ == "__main__":

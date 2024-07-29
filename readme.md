@@ -50,16 +50,17 @@ specify both the directories from which to read the data and to save the preproc
 To prepare the data for training, run the following scripts. These are idealised to run locally or on a high-performance
 computing cluster. However, not on SIRIUS, as the computing capabilities are not sufficient to run the training.
 
-From the source directory of the repository in the SIRIUS cluster:
+Travel to the source directory of the repository in the SIRIUS cluster and execute the `single_file_transfer.py`:
 
 ```bash
+cd solar_spectropolarimetry
 python3 -m src.preprocess.single_file_transfer
 ```
 
 You must then download the preprocessed data to your local machine, or to a computing cluster, for example using the `scp` command:
 
 ```bash
-scp username@sirius:/path/to/data/on/sirius username@rosa.usi.ch:/path/to/data_destination
+scp barberi@sirius:solar_spectropolarimetry/data.nosync/fe6302_basic.csv barbele@rosa.usi.ch:solar_spectropolarimetry/data.nosync/
 ```
 
 It is important that the file is saved in the same relative directory as in SIRIUS. The file name is specified in the `configs/data.py` file.
@@ -75,28 +76,26 @@ all profiles. Both input and response variables are already split for training a
 
 ## Training
 To train the deep learning model, a sbatch script is provided to run the training on a high-performance computing cluster.
-Run the following commands from the source directory to train the model:
+Run the following commands from the source directory to train the model with CUDA:
 
 ```bash
+module load python
+module load cuda
 sbatch runner.sh
+```
+
+To track the progress of the training, you can see the status of the job using `squeue` and the logs of the training
+using `cat output.txt`. For example, you can run the following to give you periodic updates. To stop printing updates use Ctrl+C:
+```bash
+while true; do squeue; cat output.txt; sleep 60; done
 ```
 
 Training configurations can be modified in the `configs/NN_config.py` file. The computing resources needed for training 
 are specified in the `runner.sh` script.
 
-If you wish to run training locally (recommended), simply run the following command:
-
+If you wish to run training locally, simply run the following command:
 ```bash
 python3 -m src.core.train
 ```
 
 The trained model will be saved in the `logs` directory, as specified in `configs/NN_config.py`.
-
-## Deployment
-To calculate the four components (I, Q, U, V) of the Stokes vector, given a set of input physical parameters, run the 
-following commands and follow the instructions on the API interface:
-
-```bash
-cd deployment
-python3 api.py
-```

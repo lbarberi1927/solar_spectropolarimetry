@@ -1,5 +1,6 @@
 import os
 
+import joblib
 import numpy as np
 import skfda
 import torch
@@ -74,7 +75,7 @@ def plot(model, x, y, y_obs, profile, index, fpca):
         ax.set_title(f"Sample Observation, Reconstruction, and Prediction: {profile}")
         ax.legend()
         ax.set_xlim(-1.5, 1.5)
-        #ax.set_ylim(-1, 1)
+        ax.set_ylim(-1, 1)
         ax.set_xlabel('Δλ')
         ax.set_ylabel(profile)
         plt.show()
@@ -104,15 +105,7 @@ def main():
         if hparams.EVAL.EXTENDED_EVAL:
             y_obs = load_labels(profile, "obs_")
 
-            fpca = FPCA(n_components=hparams.FPCA.N_COMPONENTS)
-            fpca_dictionary = np.load(
-                os.path.join(root, DATA_FOLDER, profile, f"{profile}_decomposition.npy"),
-                allow_pickle="TRUE",
-            ).item()
-
-            fpca.components_ = fpca_dictionary["components_"]
-            fpca.mean_ = fpca_dictionary["mean_"]
-            fpca.singular_values_ = fpca_dictionary["singular_values"]
+            fpca = joblib.load(os.path.join(root, DATA_FOLDER, profile, "fpca.pkl"))
 
             plot(model, x, y, y_obs, profile, index, fpca)
             obs_loader = DataLoader(

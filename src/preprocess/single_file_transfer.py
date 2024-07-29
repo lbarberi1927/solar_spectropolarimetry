@@ -13,7 +13,7 @@ os.chdir(data_folder_path)
 
 file_path = "fe6302_lte"
 
-low_temp = 4000
+low_temp = 3600
 high_temp = 6000
 temp_step = 100
 temperatures = np.arange(low_temp, high_temp + 1, temp_step)
@@ -30,8 +30,8 @@ G_conf = [str(g).zfill(4) for g in mag_strengths]
 low_gamma = 0
 high_gamma = 180
 gamma_step = 5
-gammas = np.arange(low_gamma, high_gamma + 1, gamma_step)
-#gammas = [0, 20, 45, 65, 90, 110, 135, 155, 180]
+#gammas = np.arange(low_gamma, high_gamma + 1, gamma_step)
+gammas = [0, 20, 45, 65, 90, 110, 135, 155, 180]
 g_2_conf = [str(g).zfill(3) for g in gammas]
 
 # _c
