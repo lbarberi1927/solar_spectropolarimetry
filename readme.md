@@ -98,4 +98,14 @@ If you wish to run training locally, simply run the following command:
 python3 -m src.core.train
 ```
 
-The trained model will be saved in the `logs` directory, as specified in `configs/NN_config.py`.
+The trained model will be saved in the `saved_models` directory, as specified in `configs/NN_config.py`.
+
+## Deployment
+To deploy the trained model, run the following command:
+
+```bash
+python3 -m src.core.deploy
+```
+Then simply follow the instructions in the terminal to input parameters with which to call the models.
+To exit the prediction loop, type `exit`.
+

@@ -8,7 +8,7 @@ from skfda.preprocessing.dim_reduction import FPCA
 from sklearn.model_selection import train_test_split
 from sklearn.preprocessing import StandardScaler
 
-from configs.NN_config import hparams
+from configs.NN_config import hparams, MODEL_SAVE_FOLDER
 from configs.data import DATASET_PATH, FUNCTION_DOMAIN_POINTS, DATA_FOLDER
 from src.utils import get_project_root, verify_path_exists
 
@@ -160,7 +160,7 @@ def main():
     # Normalize the input data
     scaler = StandardScaler()
     x = scaler.fit_transform(x)
-    joblib.dump(scaler, os.path.join(root, DATA_FOLDER, "scaler.pkl"))
+    joblib.dump(scaler, os.path.join(root, MODEL_SAVE_FOLDER, "scaler.pkl"))
 
     # Split the data into training and testing sets
     x_train, x_test, y_obs_train, y_obs_test = split(x, y)
@@ -197,7 +197,8 @@ def main():
         np.savetxt(
             os.path.join(save_folder, f"y_obs_test.csv"), prof_obs_test, delimiter=","
         )
-        joblib.dump(fpca, os.path.join(save_folder, f"fpca.pkl"))
+        model_folder = os.path.join(root, MODEL_SAVE_FOLDER, profile)
+        joblib.dump(fpca, os.path.join(model_folder, f"fpca.pkl"))
 
 
 if __name__ == "__main__":

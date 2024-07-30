@@ -9,7 +9,7 @@ from skfda.preprocessing.dim_reduction import FPCA
 from torch.utils.data import DataLoader, TensorDataset
 import matplotlib.pyplot as plt
 
-from configs.NN_config import hparams, SAVE_FOLDER
+from configs.NN_config import hparams, MODEL_SAVE_FOLDER
 from configs.data import DATA_FOLDER
 from src.models.functional_neural_networks.MLP import MLP
 from src.utils import get_project_root
@@ -144,7 +144,7 @@ def main():
 
         # Load the pre-trained model
         model_state_dict = torch.load(
-            os.path.join(root, SAVE_FOLDER, profile, hparams.EVAL.NAME)
+            os.path.join(root, MODEL_SAVE_FOLDER, profile, hparams.EVAL.NAME)
         )
         model = MLP()
         model.load_state_dict(model_state_dict)
@@ -153,7 +153,7 @@ def main():
             y_obs = load_labels(profile, "obs_")
 
             # Load the FPCA model
-            fpca = joblib.load(os.path.join(root, DATA_FOLDER, profile, "fpca.pkl"))
+            fpca = joblib.load(os.path.join(root, MODEL_SAVE_FOLDER, profile, "fpca.pkl"))
 
             # Plot the predictions
             plot(model, x, y, y_obs, profile, index, fpca)

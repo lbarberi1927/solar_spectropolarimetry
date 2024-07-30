@@ -1,7 +1,7 @@
 from yacs.config import CfgNode as CN
 
 # Define the folder to save logs
-SAVE_FOLDER = "logs"
+MODEL_SAVE_FOLDER = "saved_models"
 
 # Initialize hyperparameters configuration node
 hparams = CN()

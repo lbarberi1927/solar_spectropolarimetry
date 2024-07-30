@@ -6,7 +6,7 @@ import numpy as np
 import torch
 from torch.utils.data import DataLoader, TensorDataset
 
-from configs.NN_config import hparams, SAVE_FOLDER
+from configs.NN_config import hparams, MODEL_SAVE_FOLDER
 from configs.data import DATA_FOLDER
 from src.models.functional_neural_networks.MLP import MLP
 from src.utils import get_project_root, verify_path_exists
@@ -36,7 +36,7 @@ def train(train_loader, profile):
     if hparams.TRAIN.PRE_TRAINED:
         # Load pre-trained model state if specified
         model_state_dict = torch.load(
-            os.path.join(root, SAVE_FOLDER, profile, hparams.TRAIN.EXISTING_NAME)
+            os.path.join(root, MODEL_SAVE_FOLDER, profile, hparams.TRAIN.EXISTING_NAME)
         )
         model.load_state_dict(model_state_dict)
 
@@ -72,7 +72,7 @@ def train(train_loader, profile):
             model = model.cpu()
 
         # Save the trained model
-        save_path = os.path.join(root, SAVE_FOLDER, profile, hparams.TRAIN.NAME)
+        save_path = os.path.join(root, MODEL_SAVE_FOLDER, profile, hparams.TRAIN.NAME)
         verify_path_exists(Path(save_path).parent)
         torch.save(model.state_dict(), save_path)
 
